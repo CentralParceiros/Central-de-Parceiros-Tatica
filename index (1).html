@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Portal do Parceiro — Tática</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
+:root{--azul:#0D2026;--dourado:#FED26C;--verde:#2ecc71;--azul-c:#3498db;--vermelho:#e74c3c;--bg:#f0f2f5;--card:#fff;--texto:#1a1a2e;--cinza:#888;--sidebar:260px}
+body{background:var(--bg);color:var(--texto);min-height:100vh}
+
+/* LOGIN */
+#screen-login{display:flex;min-height:100vh}
+.login-left{flex:1;background:var(--azul);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;gap:32px}
+.login-left img{width:200px;object-fit:contain}
+.login-left h1{font-size:1.6rem;font-weight:800;color:var(--dourado);text-align:center}
+.login-left p{color:#aac;font-size:.9rem;line-height:1.7;text-align:center;max-width:320px}
+.login-right{flex:1;background:#f5f6fa;display:flex;align-items:center;justify-content:center;padding:60px 48px}
+.login-form{width:100%;max-width:400px}
+.login-form h2{font-size:1.8rem;font-weight:800;color:var(--azul);margin-bottom:6px}
+.login-form>p{font-size:.88rem;color:var(--cinza);margin-bottom:32px}
+.lfield{margin-bottom:18px}
+.lfield label{display:block;font-size:.75rem;color:var(--cinza);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.lfield input{width:100%;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:12px;font-size:.95rem;outline:none;background:#fff;transition:.2s}
+.lfield input:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(13,32,38,.08)}
+.btn-login{width:100%;padding:15px;background:var(--azul);color:var(--dourado);font-weight:700;font-size:1rem;border:none;border-radius:12px;cursor:pointer;transition:.2s;letter-spacing:.3px}
+.btn-login:hover{background:#1a3a44}
+.login-err{color:var(--vermelho);font-size:.82rem;margin-top:12px;text-align:center;display:none;padding:10px;background:#fff5f5;border-radius:10px;border:1px solid #fcd0d0}
+
+/* APP */
+#app,#app-admin{display:none;min-height:100vh}
+.app-layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:var(--azul);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar-logo{padding:20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sidebar-logo img{width:36px;height:36px;border-radius:8px;object-fit:contain}
+.sidebar-logo h3{color:#fff;font-size:.9rem;font-weight:700}
+.sidebar-logo p{color:#aac;font-size:.68rem}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.snav{display:flex;align-items:center;gap:12px;padding:13px 20px;color:#aac;font-size:.88rem;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:.2s;border-left:3px solid transparent}
+.snav:hover{background:rgba(255,255,255,.05);color:#fff}
+.snav.active{background:rgba(254,210,108,.1);color:var(--dourado);border-left-color:var(--dourado)}
+.snav svg{width:18px;height:18px;stroke-width:2;flex-shrink:0}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-footer .uname{font-size:.78rem;color:#aac;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#aac;border-radius:10px;cursor:pointer;font-size:.82rem}
+.btn-logout:hover{background:rgba(255,255,255,.1);color:#fff}
+.main-content{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:1.05rem;font-weight:700;color:var(--azul)}
+.topbar-user{display:flex;align-items:center;gap:10px}
+.user-avatar{width:36px;height:36px;background:var(--azul);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--dourado);font-weight:700;font-size:.88rem;flex-shrink:0}
+.user-name{font-size:.83rem;font-weight:600;color:var(--texto);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.user-role{font-size:.7rem;color:var(--cinza);text-align:right}
+.page-content{padding:24px;flex:1}
+.mobile-topbar{display:none;background:var(--azul);padding:13px 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.mobile-topbar .tb-nome{font-size:.88rem;color:#fff;font-weight:600}
+.mobile-topbar .tb-sub{font-size:.67rem;color:#aac}
+.btn-logout-sm{background:none;border:1px solid rgba(255,255,255,.3);color:#aac;border-radius:8px;padding:5px 10px;font-size:.72rem;cursor:pointer}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--azul);z-index:200;border-top:1px solid rgba(255,255,255,.1);flex-direction:row}
+.mnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;color:#aac;font-size:.58rem;gap:2px;border:none;background:none;border-top:3px solid transparent}
+.mnav.active{color:var(--dourado);border-top-color:var(--dourado)}
+.mnav svg{width:20px;height:20px;stroke-width:2}
+
+/* CARDS */
+.cards-totais{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-bottom:24px}
+.card-total{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid transparent}
+.card-total .lbl{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.card-total .vlr{font-size:1.4rem;font-weight:700;margin-top:6px}
+.card-total .sub{font-size:.7rem;color:var(--cinza);margin-top:3px}
+.ct-pago{border-left-color:var(--verde)}.ct-pago .vlr{color:var(--verde)}
+.ct-prev{border-left-color:var(--azul-c)}.ct-prev .vlr{color:var(--azul-c)}
+.ct-atr{border-left-color:var(--vermelho)}.ct-atr .vlr{color:var(--vermelho)}
+.ct-aceite{border-left-color:#f39c12}.ct-aceite .vlr{color:#d68910}
+
+/* GRÁFICO */
+.grafico-card{background:var(--card);border-radius:14px;padding:18px;margin-bottom:24px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.grafico-title{font-size:.78rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:14px}
+.grafico-bars{display:flex;align-items:flex-end;gap:12px;height:90px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bar{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .5s}
+.bar-lbl{font-size:.68rem;color:var(--cinza)}
+.bar-val{font-size:.7rem;font-weight:600}
+
+/* TABLE */
+.table-card{background:var(--card);border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden;margin-bottom:24px}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;flex-wrap:wrap;gap:10px}
+.table-header h3{font-size:.92rem;font-weight:700;color:var(--azul)}
+.filtros{display:flex;gap:6px;flex-wrap:wrap}
+.filtro-btn{padding:5px 12px;border-radius:20px;border:1.5px solid #e0e0e0;background:#fff;color:#666;font-size:.73rem;font-weight:600;cursor:pointer;transition:.2s}
+.filtro-btn.active{background:var(--azul);color:var(--dourado);border-color:var(--azul)}
+table.dt{width:100%;border-collapse:collapse;font-size:.83rem}
+.dt th{background:#f8f9fa;color:var(--cinza);font-weight:600;padding:11px 16px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.3px}
+.dt td{padding:13px 16px;border-bottom:1px solid #f5f5f5}
+.dt tr:last-child td{border:none}
+.dt tr:hover td{background:#fafafa}
+.badge{padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.badge-pago{background:#d5f5e3;color:#1a8a4a}
+.badge-prev{background:#d6eaf8;color:#1a6aa5}
+.badge-atr{background:#fadbd8;color:#a93226}
+.badge-aceite{background:#fef9e7;color:#b7950b}
+.badge-liquidado{background:#ede9ff;color:#5b4fcf}
+
+/* RECIBO */
+.recibo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.recibo-card{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.recibo-top{background:var(--azul);padding:18px 20px;display:flex;align-items:center;gap:12px}
+.recibo-top img{width:40px;height:40px;border-radius:8px}
+.recibo-top h3{color:var(--dourado);font-size:.92rem;font-weight:700}
+.recibo-top p{color:#aac;font-size:.7rem;margin-top:2px}
+.recibo-body{padding:18px}
+.recibo-info{background:#f8f9fa;border-radius:8px;padding:12px;margin-bottom:14px;font-size:.82rem;line-height:1.9;color:#555}
+.recibo-info strong{color:var(--azul)}
+.recibo-row{display:flex;justify-content:space-between;font-size:.83rem;padding:9px 0;border-bottom:1px solid #f0f0f0}
+.recibo-row:last-child{border:none}
+.r-label{color:#444;flex:1}
+.r-val{font-weight:700}
+.r-badge{font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:6px;background:#fef9e7;color:#b7950b;margin-left:4px}
+.recibo-total{display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;margin-top:12px;padding:12px;background:var(--azul);border-radius:8px;color:#fff}
+.recibo-total span:last-child{color:var(--dourado)}
+.assin-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.assin-card h3{font-size:.92rem;font-weight:700;color:var(--azul);margin-bottom:4px}
+.assin-card p{font-size:.78rem;color:var(--cinza);margin-bottom:14px}
+.assin-input{width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:.92rem;outline:none;background:#fafafa;margin-bottom:12px}
+.assin-input:focus{border-color:var(--dourado)}
+.assin-preview{border:2px solid var(--verde);border-radius:10px;padding:14px;margin-bottom:12px;text-align:center;display:none;background:#f0fff4}
+.assin-preview small{font-size:.7rem;color:var(--cinza);display:block;margin-bottom:6px}
+canvas#cvs-assin{width:100%;max-width:380px;height:85px;display:block;margin:0 auto}
+.assin-nome-txt{font-size:.75rem;color:#555;margin-top:6px;border-top:1px solid #eee;padding-top:6px}
+.assin-erro{color:var(--vermelho);font-size:.78rem;padding:8px;background:#fff5f5;border-radius:8px;margin-bottom:10px;display:none}
+.btn-conf{width:100%;padding:13px;background:var(--azul);color:var(--dourado);border:none;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer}
+.assin-ok{text-align:center;padding:26px;display:none}
+.assin-ok .ok-icon{font-size:2.8rem}
+.assin-ok h3{color:var(--verde);font-weight:700;margin-top:10px}
+.assin-ok p{color:#777;font-size:.8rem;margin-top:5px}
+.btn-pdf{width:100%;padding:12px;background:var(--dourado);color:var(--azul);border:none;border-radius:10px;font-weight:700;font-size:.88rem;cursor:pointer;margin-top:12px}
+
+/* CONSULTA — Histórico de andamento */
+.consulta-ind-card{background:var(--card);border-radius:14px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.ci-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.ci-nome{font-size:.95rem;font-weight:700;color:var(--azul)}
+.ci-data{font-size:.72rem;color:var(--cinza)}
+.timeline{display:flex;align-items:center;gap:0;margin-bottom:8px;overflow-x:auto;padding-bottom:4px}
+.tl-step{display:flex;flex-direction:column;align-items:center;min-width:80px;position:relative;flex:1}
+.tl-step:not(:last-child)::after{content:"";position:absolute;top:13px;left:50%;width:100%;height:2px;background:#e0e0e0;z-index:0}
+.tl-step.done:not(:last-child)::after{background:var(--verde)}
+.tl-dot{width:28px;height:28px;border-radius:50%;background:#e0e0e0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#aaa;z-index:1;position:relative;flex-shrink:0}
+.tl-step.done .tl-dot{background:var(--verde);color:#fff}
+.tl-step.current .tl-dot{background:var(--azul);color:var(--dourado);box-shadow:0 0 0 3px rgba(13,32,38,.18)}
+.tl-label{font-size:.6rem;color:var(--cinza);margin-top:5px;text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.tl-step.done .tl-label{color:var(--verde)}
+.tl-step.current .tl-label{color:var(--azul);font-weight:700}
+.ci-tipo{font-size:.75rem;color:#666;margin-top:6px}
+
+/* MEUS CLIENTES — Cards de progresso */
+.mc-cards{display:flex;flex-direction:column;gap:14px;padding:4px 0}
+.mc-card{background:var(--card);border-radius:14px;padding:18px 20px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.mc-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.mc-nome{font-size:.95rem;font-weight:700;color:var(--azul)}
+.mc-data-ind{font-size:.7rem;color:var(--cinza);margin-top:2px}
+.mc-vals{display:flex;gap:18px;margin-bottom:12px;flex-wrap:wrap}
+.mc-val-item{display:flex;flex-direction:column;gap:2px}
+.mc-val-label{font-size:.65rem;color:var(--cinza);text-transform:uppercase;font-weight:600;letter-spacing:.3px}
+.mc-val-num{font-size:.9rem;font-weight:700}
+.mc-prog-wrap{margin-top:2px}
+.mc-prog-info{display:flex;justify-content:space-between;font-size:.7rem;color:var(--cinza);margin-bottom:5px}
+.mc-prog-bar-bg{height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.mc-prog-bar-fill{height:100%;border-radius:4px;background:var(--verde);transition:width .6s}
+.mc-badges-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.mc-parc-badge{font-size:.65rem;padding:3px 8px;border-radius:10px;font-weight:700}
+.mc-parc-pago{background:#d5f5e3;color:#1a8a4a}
+.mc-parc-prev{background:#d6eaf8;color:#1a6aa5}
+.mc-parc-atr{background:#fadbd8;color:#a93226}
+.mc-parc-aceite{background:#fef9e7;color:#b7950b}
+
+
+.search-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.search-card h3{font-size:.92rem;font-weight:700;color:var(--azul);margin-bottom:14px}
+.search-input{width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:.92rem;outline:none;background:#fafafa;margin-bottom:12px}
+.search-input:focus{border-color:var(--dourado)}
+.btn-buscar{width:100%;padding:12px;background:var(--azul);color:var(--dourado);border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem}
+.res-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:none}
+.res-nome{font-size:1rem;font-weight:700;color:var(--azul);margin-bottom:8px}
+.res-obs{background:#f8f9fa;border-radius:8px;padding:12px;font-size:.82rem;color:#555;margin:10px 0;border-left:3px solid var(--dourado);line-height:1.7}
+.btn-wpp{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;text-decoration:none;margin-top:8px}
+
+/* FORM */
+.form-card{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.form-card h3{font-size:.92rem;font-weight:700;color:var(--azul);margin-bottom:4px}
+.form-card p{font-size:.78rem;color:var(--cinza);margin-bottom:18px}
+.field label{display:block;font-size:.72rem;color:var(--cinza);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field textarea{width:100%;padding:12px 14px;border:1.5px solid #e8e8e8;border-radius:10px;font-size:.9rem;outline:none;background:#fafafa;margin-bottom:14px;font-family:inherit;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--dourado);background:#fff}
+.field textarea{resize:vertical;min-height:90px}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.parceiro-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.pc-nome{font-size:.92rem;font-weight:700;color:var(--azul)}
+.pc-email{font-size:.73rem;color:var(--cinza);margin-top:3px}
+.pc-vals{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}
+.pc-tag{font-size:.7rem;font-weight:600;padding:3px 9px;border-radius:8px}
+.btn-wpp-sm{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#25D366;color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:.8rem}
+
+/* ADMIN NOVO — Dashboard, Gráficos, Relatório */
+.adm-top-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
+.adm-tc{background:var(--card);border-radius:12px;padding:15px 16px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid transparent}
+.adm-tc-label{font-size:.68rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:5px}
+.adm-tc-val{font-size:1.35rem;font-weight:700}
+.adm-tc-sub{font-size:.67rem;color:var(--cinza);margin-top:2px}
+.adm-tc-pago{border-left-color:#2ecc71}.adm-tc-pago .adm-tc-val{color:#1a8a4a}
+.adm-tc-prev{border-left-color:var(--azul-c)}.adm-tc-prev .adm-tc-val{color:#1a6aa5}
+.adm-tc-atr{border-left-color:var(--vermelho)}.adm-tc-atr .adm-tc-val{color:#a93226}
+.adm-tc-n .adm-tc-val{color:var(--azul)}
+.adm-tc-vol{border-left-color:#7F77DD}.adm-tc-vol .adm-tc-val{color:#3C3489}
+.adm-snav-tabs{display:flex;border-bottom:2px solid #eee;margin-bottom:20px;gap:0}
+.adm-tab{padding:10px 18px;font-size:.82rem;font-weight:700;border:none;background:none;cursor:pointer;color:var(--cinza);border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s}
+.adm-tab.active{color:var(--azul);border-bottom-color:var(--azul)}
+.adm-tab:hover{color:var(--azul)}
+.adm-screen{display:none}
+.adm-screen.active{display:block}
+.adm-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.adm-chart-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:14px}
+.adm-chart-title{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:12px}
+.adm-legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:.7rem;color:var(--cinza)}
+.adm-leg-dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle}
+.adm-pc-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.adm-pc-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.adm-avatar{width:42px;height:42px;border-radius:50%;background:var(--azul);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-weight:700;font-size:.95rem;flex-shrink:0}
+.adm-pc-name{font-size:.9rem;font-weight:700;color:var(--azul)}
+.adm-pc-email{font-size:.7rem;color:var(--cinza);margin-top:2px}
+.adm-pc-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.adm-ps{background:#f8f9fa;border-radius:8px;padding:8px 10px}
+.adm-ps-label{font-size:.63rem;color:var(--cinza);text-transform:uppercase;font-weight:600;margin-bottom:3px}
+.adm-ps-val{font-size:.84rem;font-weight:700}
+.adm-ps-verde .adm-ps-val{color:#1a8a4a}
+.adm-ps-azul .adm-ps-val{color:#1a6aa5}
+.adm-ps-atr .adm-ps-val{color:#a93226}
+.adm-prog-bg{height:5px;background:#eee;border-radius:3px;overflow:hidden;margin:8px 0 4px}
+.adm-prog-fill{height:100%;border-radius:3px;background:#2ecc71;transition:width .5s}
+.adm-prog-label{font-size:.65rem;color:var(--cinza)}
+.adm-rentab{border-left:3px solid;padding:8px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:.73rem;line-height:1.6}
+.adm-rentab-pos{border-color:#2ecc71;background:#f0fff4;color:#085041}
+.adm-rentab-neg{border-color:var(--vermelho);background:#fff5f5;color:#791F1F}
+.adm-wpp-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;background:#25D366;color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:.78rem;margin-top:10px}
+.adm-alertas{display:flex;flex-direction:column;gap:10px}
+.adm-alerta{border-left:3px solid;padding:12px 16px;border-radius:0 10px 10px 0;font-size:.81rem;line-height:1.7}
+.adm-rel-table{width:100%;border-collapse:collapse;font-size:.79rem}
+.adm-rel-table th{background:#f8f9fa;color:var(--cinza);font-weight:600;padding:9px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;border-bottom:1px solid #eee}
+.adm-rel-table td{padding:11px 14px;border-bottom:1px solid #f5f5f5}
+.adm-rel-table tr:last-child td{border:none}
+.adm-rel-table tr:hover td{background:#fafafa}
+.rentab-pill{padding:3px 9px;border-radius:20px;font-size:.67rem;font-weight:700;white-space:nowrap}
+.pill-pos{background:#d5f5e3;color:#1a8a4a}
+.pill-neg{background:#fadbd8;color:#a93226}
+.adm-loading{text-align:center;padding:40px;color:var(--cinza);font-size:.88rem}
+
+/* FILTRO BAR — admin e parceiro */
+.filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-bar label{font-size:.72rem;color:var(--cinza);font-weight:600;text-transform:uppercase;white-space:nowrap}
+.filter-select{padding:7px 12px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:.8rem;background:#fff;color:var(--texto);outline:none;cursor:pointer;transition:.2s}
+.filter-select:focus{border-color:var(--azul)}
+.filter-tag{display:flex;gap:6px;flex-wrap:wrap}
+.ftag{padding:5px 13px;border-radius:20px;border:1.5px solid #e0e0e0;background:#fff;color:#666;font-size:.73rem;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+.ftag.active{background:var(--azul);color:var(--dourado);border-color:var(--azul)}
+.filter-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.filter-row h3{font-size:.92rem;font-weight:700;color:var(--azul)}
+
+/* FILTRO DATA/CLIENTE */
+.filtro-data-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;background:#fff;border-radius:12px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.filtro-data-bar label{font-size:.7rem;color:var(--cinza);font-weight:700;text-transform:uppercase;white-space:nowrap}
+.filtro-data-bar .filter-select{padding:6px 10px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.78rem;background:#fff;outline:none;cursor:pointer}
+.filtro-data-bar .filter-select:focus{border-color:var(--azul)}
+.filtro-sep{width:1px;height:22px;background:#e0e0e0;margin:0 4px}
+/* MODAL PDF */
+.modal-pdf-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+.modal-pdf-overlay.open{display:flex}
+.modal-pdf-box{background:#fff;border-radius:18px;padding:32px 28px;max-width:400px;width:92%;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.modal-pdf-box h3{font-size:1rem;font-weight:800;color:var(--azul);margin-bottom:6px}
+.modal-pdf-box p{font-size:.82rem;color:var(--cinza);margin-bottom:22px;line-height:1.6}
+.modal-pdf-btn{width:100%;padding:13px;border:none;border-radius:11px;font-weight:700;font-size:.88rem;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:10px;transition:.15s}
+.modal-pdf-btn:hover{filter:brightness(.95)}
+.modal-pdf-filtrado{background:var(--azul);color:var(--dourado)}
+.modal-pdf-completo{background:#f0f2f5;color:var(--azul)}
+.modal-pdf-cancel{background:none;color:var(--cinza);font-size:.8rem;padding:8px;margin-bottom:0;justify-content:center}
+.comp-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:14px}
+
+/* PAINEL UNIFICADO PARCEIRO */
+.painel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.painel-title-sub{font-size:.85rem;color:var(--cinza);font-weight:500}
+.btn-pdf-rel{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--azul);color:var(--dourado);border:none;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;transition:.2s;white-space:nowrap}
+.btn-pdf-rel:hover{background:#1a3a44;transform:translateY(-1px)}
+.btn-pdf-rel:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.par-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.ct-ativos{border-left-color:#7F77DD}.ct-ativos .vlr{color:#3C3489}
+.ct-cancel{border-left-color:#888}.ct-cancel .vlr{color:#555}
+#par-cards-totais{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.cli-mini-card{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:10px;border-left:3px solid transparent}
+.cli-mini-card.ativo{border-left-color:#2ecc71}
+.cli-mini-card.cancelado{border-left-color:var(--vermelho);opacity:.75}
+.cli-mini-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.cli-mini-nome{font-size:.88rem;font-weight:700;color:var(--azul)}
+.cli-mini-stats{display:flex;gap:16px;flex-wrap:wrap}
+.cli-mini-stat{font-size:.72rem;color:var(--cinza)}
+.cli-mini-stat span{font-weight:700;color:var(--texto);display:block;font-size:.84rem}
+.par-cli-empty{padding:18px;text-align:center;color:var(--cinza);font-size:.85rem;background:#fafafa;border-radius:10px}
+
+/* Header admin com botão PDF */
+.adm-page-header{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.comp-title{font-size:.72rem;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.inativo-badge{background:#fadbd8;color:#a93226;font-size:.65rem;padding:2px 8px;border-radius:20px;font-weight:700}
+.comp-subtitle{font-size:.72rem;color:var(--cinza);margin-bottom:12px}
+
+/* RELATÓRIO PARCEIRO */
+.rel-par-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.rel-par-card{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,.07);border-left:4px solid transparent}
+.rel-par-card .rp-label{font-size:.68rem;color:var(--cinza);text-transform:uppercase;font-weight:600;margin-bottom:5px}
+.rel-par-card .rp-val{font-size:1.25rem;font-weight:700}
+.rel-par-card .rp-sub{font-size:.67rem;color:var(--cinza);margin-top:3px}
+.rp-pago{border-left-color:#2ecc71}.rp-pago .rp-val{color:#1a8a4a}
+.rp-prev{border-left-color:var(--azul-c)}.rp-prev .rp-val{color:#1a6aa5}
+.rp-ativos{border-left-color:#7F77DD}.rp-ativos .rp-val{color:#3C3489}
+.rp-cancel{border-left-color:var(--vermelho)}.rp-cancel .rp-val{color:#a93226}
+.cli-mini-card{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:10px;border-left:3px solid transparent}
+.cli-mini-card.ativo{border-left-color:#2ecc71}
+.cli-mini-card.cancelado{border-left-color:var(--vermelho);opacity:.75}
+.cli-mini-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cli-mini-nome{font-size:.88rem;font-weight:700;color:var(--azul)}
+.cli-mini-stats{display:flex;gap:16px;flex-wrap:wrap}
+.cli-mini-stat{font-size:.72rem;color:var(--cinza)}
+.cli-mini-stat span{font-weight:700;color:var(--texto);display:block;font-size:.84rem}
+.rel-par-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+
+@media(max-width:767px){
+  .adm-charts-row{grid-template-columns:1fr}
+  .adm-top-cards{grid-template-columns:1fr 1fr}
+  .adm-pc-stats{grid-template-columns:1fr 1fr}
+  .rel-par-chart-row{grid-template-columns:1fr}
+  .par-charts-row{grid-template-columns:1fr}
+  .painel-header{flex-direction:column;align-items:stretch}
+  .btn-pdf-rel{width:100%;justify-content:center}
+}
+.empty{text-align:center;color:var(--cinza);padding:36px;font-size:.86rem}
+.empty-recibo{text-align:center;color:var(--cinza);padding:18px;font-size:.86rem}
+
+@media(min-width:768px){
+  .mobile-topbar,.mobile-nav{display:none!important}
+  .sidebar{display:flex}
+  .main-content{margin-left:var(--sidebar)}
+}
+@media(max-width:767px){
+  #screen-login{flex-direction:column}
+  .login-left{flex:none;padding:40px 24px;min-height:200px}
+  .login-left img{width:140px}
+  .login-right{padding:36px 24px}
+  .sidebar{display:none!important}
+  .main-content{margin-left:0;padding-bottom:72px}
+  .mobile-topbar{display:flex}
+  .mobile-nav{display:flex}
+  .page-content{padding:14px}
+  .cards-totais{gap:8px}
+  .card-total .vlr{font-size:1rem}
+  .recibo-wrap,.consulta-wrap{grid-template-columns:1fr}
+  .admin-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .card-total{padding:12px 8px}
+  .card-total .vlr{font-size:.9rem}
+  .card-total .lbl{font-size:.6rem}
+}
+/* FAQ */
+.faq-section{margin-bottom:20px}
+.faq-section-title{font-size:.78rem;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;padding-left:4px}
+.faq-item{background:var(--card);border-radius:12px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;cursor:pointer;border:1.5px solid transparent;transition:.2s}
+.faq-item:hover{border-color:var(--dourado)}
+.faq-item.open{border-color:var(--azul)}
+.faq-q{padding:16px 18px;font-size:.88rem;font-weight:600;color:#1a1a2e;display:flex;justify-content:space-between;align-items:center;gap:12px;user-select:none}
+.faq-arrow{font-size:.7rem;color:var(--cinza);transition:.3s;flex-shrink:0}
+.faq-item.open .faq-arrow{transform:rotate(180deg);color:var(--azul)}
+.faq-a{display:none;padding:0 18px 16px;font-size:.83rem;color:#555;line-height:1.8;border-top:1px solid #f0f0f0}
+.faq-item.open .faq-a{display:block}
+.faq-exemplo{background:#f8f9fa;border-left:3px solid var(--dourado);border-radius:0 8px 8px 0;padding:10px 12px;margin-top:10px;font-size:.8rem;color:#555;line-height:1.7}
+
+/* COMERCIAL/USUARIOS */
+#app-comercial{display:none;min-height:100vh}
+</style>
+</head>
+<body>
+
+<!-- MODAL PDF -->
+<div class="modal-pdf-overlay" id="modal-pdf">
+  <div class="modal-pdf-box">
+    <h3>📄 Gerar Relatório PDF</h3>
+    <p>Selecione se o relatório deve refletir os filtros aplicados na tela ou incluir todos os dados.</p>
+    <button class="modal-pdf-btn modal-pdf-filtrado" onclick="confirmarPdf('filtrado')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      Relatório filtrado <small style="font-weight:400;font-size:.72rem;opacity:.8">(como exibido na tela)</small>
+    </button>
+    <button class="modal-pdf-btn modal-pdf-completo" onclick="confirmarPdf('completo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Relatório completo <small style="font-weight:400;font-size:.72rem;opacity:.7">(todos os dados)</small>
+    </button>
+    <button class="modal-pdf-btn modal-pdf-cancel" onclick="fecharModalPdf()">Cancelar</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="screen-login">
+  <div class="login-left">
+    <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática Gestão Contábil"/>
+    <h1>Central de Parceiros</h1>
+    <p>Acompanhe comissões, assine recibos e consulte indicações em um só lugar.</p>
+  </div>
+  <div class="login-right">
+    <div class="login-form">
+      <h2>Bem-vindo de volta!</h2>
+      <p>Acesse sua conta para continuar</p>
+      <div class="lfield">
+        <label>E-mail</label>
+        <input id="inp-user" type="email" placeholder="seu@email.com" autocomplete="username"/>
+      </div>
+      <div class="lfield">
+        <label>Senha</label>
+        <input id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP PARCEIRO -->
+<div id="app">
+  <div class="mobile-topbar">
+    <div><div class="tb-nome" id="tb-nome-m"></div><div class="tb-sub">Parceiro Tática</div></div>
+    <button class="btn-logout-sm" onclick="doLogout()">Sair</button>
+  </div>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática Gestão Contábil"/>
+        <div><h3>Central de Parceiros</h3><p>Tática Gestão Contábil</p></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="snav active" onclick="goTo('painel',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel
+        </button>
+        <button class="snav" onclick="goTo('aceite',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Aceite Digital
+        </button>
+        <button class="snav" onclick="goTo('consulta',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Consulta
+        </button>
+        <button class="snav" onclick="goTo('clientes',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Meus Clientes
+        </button>
+        <button class="snav" onclick="goTo('indicar',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Indicar Cliente
+        </button>
+        <button class="snav" onclick="goTo('faq',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Dúvidas Frequentes
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="uname" id="sidebar-nome"></div>
+        <button class="btn-logout" onclick="doLogout()">Sair da conta</button>
+      </div>
+    </aside>
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title">Painel &amp; Relatório</div>
+        <div class="topbar-user">
+          <div><div class="user-name" id="topbar-nome"></div><div class="user-role">Parceiro de Indicação</div></div>
+          <div class="user-avatar" id="user-avatar">?</div>
+        </div>
+      </div>
+      <div class="page-content">
+
+        <!-- PAINEL UNIFICADO -->
+        <div id="screen-painel" class="screen">
+          <div class="painel-header">
+            <div>
+              <div class="painel-title-sub">Visão geral das suas comissões e clientes</div>
+            </div>
+            <button class="btn-pdf-rel" onclick="abrirModalPdf('parceiro')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar relatório PDF
+            </button>
+          </div>
+
+          <!-- Filtros de Data e Cliente -->
+          <div class="filtro-data-bar">
+            <label>Período:</label>
+            <div class="filter-tag" id="par-atalhos-data">
+              <button class="ftag active" onclick="parSetAtalho('mes',this)">Este mês</button>
+              <button class="ftag" onclick="parSetAtalho('anterior',this)">Mês anterior</button>
+              <button class="ftag" onclick="parSetAtalho('3m',this)">Últimos 3 meses</button>
+              <button class="ftag" onclick="parSetAtalho('tudo',this)">Tudo</button>
+            </div>
+            <div class="filtro-sep"></div>
+            <select class="filter-select" id="par-filtro-mes" onchange="parSetMesAno()">
+              <option value="">Mês</option>
+              <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+              <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+              <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+              <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+            </select>
+            <select class="filter-select" id="par-filtro-ano" onchange="parSetMesAno()">
+              <option value="">Ano</option>
+            </select>
+            <div class="filtro-sep"></div>
+            <label>Cliente:</label>
+            <input type="text" class="filter-select" id="par-filtro-cliente" placeholder="Buscar cliente..." oninput="parFiltrarLista()" style="min-width:140px">
+          </div>
+
+          <!-- Cards de totais -->
+          <div class="cards-totais" id="par-cards-totais">
+            <div class="card-total ct-pago"><div class="lbl">Pago</div><div class="vlr" id="tot-pago">—</div><div class="sub">Total recebido</div></div>
+            <div class="card-total ct-aceite"><div class="lbl">Sem Aceite</div><div class="vlr" id="tot-sem-aceite">—</div><div class="sub">Aguardando assinatura</div></div>
+            <div class="card-total ct-prev"><div class="lbl">Previsto</div><div class="vlr" id="tot-prev">—</div><div class="sub">A receber</div></div>
+            <div class="card-total ct-atr"><div class="lbl">Em Atraso</div><div class="vlr" id="tot-atr">—</div><div class="sub">Pendente</div></div>
+          </div>
+
+          <!-- Gráficos lado a lado -->
+          <div class="par-charts-row">
+            <div class="grafico-card">
+              <div class="grafico-title">Distribuição de Comissões</div>
+              <div style="position:relative;height:200px"><canvas id="par-chart-comissoes" role="img" aria-label="Distribuição de comissões"></canvas></div>
+            </div>
+            <div class="grafico-card">
+              <div class="grafico-title">Situação dos Clientes</div>
+              <div style="position:relative;height:200px"><canvas id="par-chart-clientes" role="img" aria-label="Situação dos clientes"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Tabela de Indicações com filtros -->
+          <div class="table-card">
+            <div class="table-header">
+              <h3>Minhas Indicações &amp; Comissões</h3>
+              <div class="filtros">
+                <button class="filtro-btn active" onclick="filtrar('TODOS',this)">Todos</button>
+                <button class="filtro-btn" onclick="filtrar('PAGO',this)">Pagos</button>
+                <button class="filtro-btn" onclick="filtrar('PREVISTO',this)">Previstos</button>
+                <button class="filtro-btn" onclick="filtrar('SEM_ACEITE',this)">Sem Aceite</button>
+                <button class="filtro-btn" onclick="filtrar('EM ATRASO',this)">Em Atraso</button>
+              </div>
+            </div>
+            <div id="lista-ind"><div class="empty">Carregando...</div></div>
+          </div>
+
+        </div>
+
+        <!-- ACEITE -->
+        <div id="screen-aceite" class="screen" style="display:none">
+          <div class="recibo-wrap">
+            <div class="recibo-card">
+              <div class="recibo-top">
+                <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática Gestão Contábil"/>
+                <div><h3>Recibo de Comissão</h3><p id="mes-ref">Carregando...</p></div>
+              </div>
+              <div class="recibo-body">
+                <div class="recibo-info">
+                  <strong>Pagador:</strong> Tática Gestão Contábil · CNPJ: 18.809.456/0001-62<br>
+                  <strong>Recebedor:</strong> <span id="rec-nome">—</span><br>
+                  <strong>Chave PIX:</strong> <span id="rec-pix">—</span>
+                </div>
+                <div id="recibo-rows"></div>
+                <div class="recibo-total" id="recibo-total-row" style="display:none">
+                  <span>Total a Receber</span><span id="recibo-total">—</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="assin-card" id="assin-area">
+                <h3>✍️ Assinatura Eletrônica</h3>
+                <p>Digite seu CPF ou CNPJ para assinar</p>
+                <input class="assin-input" id="inp-cpf" type="text" placeholder="000.000.000-00 ou 00.000.000/0001-00" oninput="validarCPF(this.value)"/>
+                <div class="assin-preview" id="assin-preview">
+                  <small>Assinatura gerada:</small>
+                  <canvas id="cvs-assin" width="380" height="85"></canvas>
+                  <div class="assin-nome-txt" id="assin-nome-txt"></div>
+                </div>
+                <div class="assin-erro" id="assin-erro"></div>
+                <button class="btn-conf" id="btn-conf" onclick="assinar()">Confirmar Aceite</button>
+              </div>
+              <div class="assin-card assin-ok" id="assin-ok">
+                <div class="ok-icon">✅</div>
+                <h3>Aceite Confirmado!</h3>
+                <p id="assin-ok-ts"></p>
+                <button class="btn-pdf" onclick="gerarPDF()">📄 Baixar Recibo em PDF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONSULTA -->
+        <div id="screen-consulta" class="screen" style="display:none">
+          <div class="search-card" style="margin-bottom:20px">
+            <h3>🔍 Consultar Andamento da Indicação</h3>
+            <div style="display:flex;gap:10px;margin-top:14px">
+              <input class="search-input" id="inp-busca" type="text" placeholder="Filtrar por nome do cliente..." style="margin:0;flex:1" oninput="filtrarConsulta()"/>
+              <button class="btn-buscar" style="width:auto;padding:12px 20px" onclick="filtrarConsulta()">Buscar</button>
+            </div>
+          </div>
+          <div id="consulta-lista"><div class="empty">Carregando...</div></div>
+        </div>
+
+        <!-- MEUS CLIENTES -->
+        <div id="screen-clientes" class="screen" style="display:none">
+          <div style="background:#fff;border-radius:14px 14px 0 0;padding:16px 20px;box-shadow:0 2px 10px rgba(0,0,0,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <h3 style="font-size:.92rem;font-weight:700;color:var(--azul)">👥 Meus Clientes</h3>
+            <div class="filtros">
+              <button class="filtro-btn active" id="cli-filtro-ativo" onclick="filtrarClientes('ativo',this)">✅ Ativos</button>
+              <button class="filtro-btn" id="cli-filtro-cancelado" onclick="filtrarClientes('cancelado',this)">❌ Cancelados</button>
+              <button class="filtro-btn" id="cli-filtro-liquidado" onclick="filtrarClientes('liquidado',this)">🏆 Concluídos</button>
+            </div>
+          </div>
+          <div id="lista-clientes"><div class="empty" style="padding:30px;text-align:center;background:#fff;border-radius:0 0 14px 14px">Carregando...</div></div>
+        </div>
+
+        <!-- INDICAR -->
+        <div id="screen-indicar" class="screen" style="display:none">
+          <div class="form-card" style="max-width:560px">
+            <h3>➕ Indicar Novo Cliente</h3>
+            <p>Ajude-nos a crescer indicando um novo cliente!</p>
+            <div class="field"><label>Nome do Cliente *</label><input id="ind-nome" type="text" placeholder="Nome completo da empresa"/></div>
+            <div class="field"><label>Email</label><input id="ind-email" type="email" placeholder="contato@empresa.com"/></div>
+            <div class="field"><label>Telefone</label><input id="ind-tel" type="text" placeholder="(82) 9xxxx-xxxx"/></div>
+            <div class="field"><label>Tipo de Serviço</label><input id="ind-tipo" type="text" placeholder="Ex: Contabilidade, Fiscal, BPO"/></div>
+            <div class="field"><label>Mensagem (opcional)</label><textarea id="ind-msg" placeholder="Conte-nos mais sobre o cliente..."></textarea></div>
+            <div id="ind-erro" style="display:none;color:var(--vermelho);font-size:.8rem;padding:8px;background:#fff5f5;border-radius:8px;margin-bottom:10px"></div>
+            <div id="ind-ok" style="display:none;color:var(--verde);font-size:.85rem;padding:10px;background:#f0fff4;border-radius:8px;margin-bottom:10px;text-align:center">✅ Indicação enviada com sucesso! Acompanhe o andamento na aba <strong>Consulta</strong>.</div>
+            <button class="btn-conf" id="btn-indicar" onclick="enviarIndicacao()">Enviar Indicação</button>
+          </div>
+        </div>
+
+
+
+        <!-- FAQ -->
+        <div id="screen-faq" class="screen" style="display:none">
+          <div style="max-width:780px">
+
+            <div style="background:linear-gradient(135deg,var(--azul),#1a3a44);border-radius:16px;padding:28px 30px;margin-bottom:24px;display:flex;align-items:center;gap:18px">
+              <div style="font-size:2.4rem">❓</div>
+              <div>
+                <div style="font-size:1.1rem;font-weight:800;color:var(--dourado)">Dúvidas Frequentes</div>
+                <div style="font-size:.82rem;color:#aac;margin-top:3px">Tudo sobre o Programa Central de Parceiros Tática</div>
+              </div>
+            </div>
+
+            <!-- PAGAMENTOS -->
+            <div class="faq-section">
+              <div class="faq-section-title">💰 Pagamento de Comissões</div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Quando recebo a comissão do primeiro pagamento do cliente?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  O repasse da comissão do <strong>primeiro honorário</strong> é realizado em até <strong>72 horas</strong> após a confirmação do pagamento pelo cliente. Você recebe <strong>100% do valor</strong> desse primeiro honorário.
+                  <div class="faq-exemplo">
+                    <strong>Exemplo:</strong> Cliente pagou R$ 600,00 na segunda-feira → você recebe R$ 600,00 até quinta-feira.
+                  </div>
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">E os pagamentos recorrentes (a partir do 2º)? Quando recebo?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  A partir do <strong>segundo pagamento</strong> do cliente, o processo funciona assim:
+                  <ol style="margin:10px 0 10px 18px;line-height:2.4">
+                    <li>O cliente paga o honorário em determinado mês</li>
+                    <li>A partir do <strong>dia 5 do mês seguinte</strong>, o recibo de comissão fica disponível para assinatura aqui no app</li>
+                    <li>A Tática te notifica por <strong>WhatsApp e e-mail</strong> avisando que há comissão aguardando sua assinatura</li>
+                    <li>Você acessa a aba <strong>Aceite Digital</strong> e assina o recibo pelo app — sem precisar enviar NF ou RPA</li>
+                    <li>No <strong>dia 20 do mês seguinte à assinatura</strong>, o pagamento é efetuado</li>
+                  </ol>
+                  <div class="faq-exemplo">
+                    <strong>Exemplo passo a passo:</strong><br>
+                    📅 <strong>Abril</strong> — cliente paga o honorário<br>
+                    📅 <strong>A partir do dia 5 de maio</strong> — recibo aparece no app + você recebe notificação por WhatsApp/e-mail<br>
+                    ✍️ <strong>Maio</strong> — você assina o aceite digital no app<br>
+                    💰 <strong>Dia 20 de junho</strong> — pagamento da comissão efetuado
+                  </div>
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Quanto recebo de comissão recorrente?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  <strong>10% do valor do honorário mensal</strong> do cliente a partir do segundo pagamento, por 12 meses.
+                  <div class="faq-exemplo">
+                    <strong>Exemplo:</strong> Cliente paga R$ 600,00/mês → você recebe R$ 600,00 no 1º mês + R$ 60,00/mês do 2º ao 12º mês.
+                    <br>Total em 12 meses: R$ 600 + (11 × R$ 60) = <strong>R$ 1.260,00</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Preciso emitir Nota Fiscal ou RPA para receber?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  <strong>Não.</strong> O processo é 100% pelo app. Basta assinar o recibo na aba <strong>Aceite Digital</strong> quando você receber a notificação. Não é necessário enviar nenhum documento por e-mail — a assinatura digital no app já é suficiente para processar o pagamento.
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">O que acontece se o cliente cancelar?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  Se o cliente <strong>cancelar o contrato</strong> com a Tática, as comissões futuras são encerradas automaticamente. Você recebe normalmente até o último mês em que o cliente estava ativo e adimplente. Comissões já devidas e documentadas continuam sendo pagas.
+                </div>
+              </div>
+            </div>
+
+            <!-- INDICAÇÕES -->
+            <div class="faq-section">
+              <div class="faq-section-title">🤝 Indicações</div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Como faço para indicar um cliente?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  Acesse a aba <strong>Indicar Cliente</strong> no menu lateral, preencha o nome, telefone e e-mail do cliente e clique em enviar. A equipe comercial da Tática entrará em contato com o cliente indicado.
+                  <br><br>Acompanhe o andamento da indicação na aba <strong>Consulta</strong>.
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Minha indicação é válida?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  A indicação é válida quando:
+                  <ul style="margin:8px 0 0 18px;line-height:2">
+                    <li>O cliente <strong>ainda não tinha contato</strong> com a Tática antes da sua indicação</li>
+                    <li>O cliente <strong>fechar contrato e realizar o pagamento</strong></li>
+                    <li>Não for uma indicação duplicada</li>
+                  </ul>
+                  Indicações de clientes que já estavam em negociação com a Tática não geram comissão.
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Como acompanho o status da minha indicação?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  Na aba <strong>Consulta</strong> você vê a evolução de cada indicação em tempo real:
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                    <span class="badge badge-aceite">🆕 Nova Indicação</span>
+                    <span style="color:#888">→</span>
+                    <span class="badge badge-prev">📞 Em Contato</span>
+                    <span style="color:#888">→</span>
+                    <span class="badge badge-prev">🤝 Em Negociação</span>
+                    <span style="color:#888">→</span>
+                    <span class="badge badge-pago">✅ Fechado</span>
+                  </div>
+                  <div style="margin-top:8px;font-size:.8rem;color:#888">Após fechar, o cliente passa para a aba <strong>Meus Clientes</strong> como Ativo.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ACEITE -->
+            <div class="faq-section">
+              <div class="faq-section-title">✍️ Aceite Digital</div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Para que serve o aceite digital?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  O aceite digital é a sua <strong>assinatura eletrônica no recibo de comissão</strong>, feita aqui no app. Ele substitui a Nota Fiscal ou RPA — sem precisar enviar nenhum documento. É a assinatura que <strong>libera o pagamento</strong>: sem aceite, a comissão fica pendente e o pagamento não é processado.
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Como sei quando tenho recibo para assinar?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  A Tática te avisa automaticamente! A partir do <strong>dia 5 de cada mês</strong>, quando houver comissão disponível, você receberá uma notificação por <strong>WhatsApp e e-mail</strong>. Basta acessar a aba <strong>Aceite Digital</strong> e assinar.
+                  <div class="faq-exemplo">
+                    Você também pode verificar a qualquer momento: se aparecer o badge <span class="badge badge-aceite" style="font-size:.7rem">Sem Aceite</span> no seu painel, há recibo aguardando assinatura.
+                  </div>
+                </div>
+              </div>
+
+              <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-q">Como assino o recibo?<span class="faq-arrow">▼</span></div>
+                <div class="faq-a">
+                  Acesse a aba <strong>Aceite Digital</strong> no menu, confira os valores listados e digite seu CPF ou CNPJ cadastrado para confirmar. O sistema gera sua assinatura eletrônica automaticamente. Simples e rápido, sem precisar enviar nenhum documento.
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTATO -->
+            <div class="faq-section">
+              <div class="faq-section-title">📞 Contato</div>
+              <div style="background:var(--card);border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.07)">
+                <div style="font-size:.85rem;color:#555;line-height:2">
+                  Ainda tem dúvidas? Entre em contato diretamente com a equipe Tática:
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:14px">
+                  <a href="https://wa.me/558230243993" target="_blank" class="btn-wpp" style="width:auto;padding:10px 18px;text-decoration:none">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.522 5.847L.057 23.882l6.19-1.622A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-4.988-1.365l-.358-.214-3.71.973.99-3.614-.233-.372A9.794 9.794 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+                    WhatsApp: (82) 3024-3993
+                  </a>
+                  <a href="mailto:financeiro@taticacontabilidade.com" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--azul);color:var(--dourado);border-radius:10px;font-weight:700;font-size:.88rem;text-decoration:none">
+                    📧 financeiro@taticacontabilidade.com
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+  <nav class="mobile-nav">
+    <button class="mnav active" onclick="goTo('painel',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel
+    </button>
+    <button class="mnav" onclick="goTo('aceite',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Aceite
+    </button>
+    <button class="mnav" onclick="goTo('consulta',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Consulta
+    </button>
+    <button class="mnav" onclick="goTo('clientes',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes
+    </button>
+    <button class="mnav" onclick="goTo('indicar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Indicar
+    </button>
+    <button class="mnav" onclick="goTo('faq',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Dúvidas
+    </button>
+  </nav>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP ADMIN -->
+<div id="app-admin">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática Gestão Contábil"/>
+        <div><h3>Administração</h3><p>Tática Gestão Contábil</p></div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="snav active" onclick="admGoTo('dashboard',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+        </button>
+        <button class="snav" onclick="admGoTo('parceiros',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Parceiros
+        </button>
+        <button class="snav" onclick="admGoTo('relatorio',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Relatório
+        </button>
+        <button class="snav" onclick="admGoTo('alertas',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Alertas
+        </button>
+        <button class="snav" onclick="admGoTo('comparativo',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Comparativo
+        </button>
+        <button class="snav" onclick="admGoTo('usuarios',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="19" y1="8" x2="23" y2="8"/><line x1="21" y1="6" x2="21" y2="10"/></svg>Usuários
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="uname" id="adm-nome-display">Danielle — Admin</div>
+        <button class="btn-logout" onclick="doLogout()">Sair da conta</button>
+      </div>
+    </aside>
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-title" id="adm-page-title">Dashboard</div>
+        <div class="topbar-user">
+          <div><div class="user-name" id="adm-nome-avatar">Danielle</div><div class="user-role" id="adm-user-role">Administradora</div></div>
+          <div class="user-avatar" id="adm-user-avatar">D</div>
+        </div>
+      </div>
+      <div class="page-content">
+
+        <div id="adm-loading" class="adm-loading">Carregando dados...</div>
+        <div id="adm-content" style="display:none">
+
+          <div class="adm-page-header">
+            <button class="btn-pdf-rel" onclick="abrirModalPdf('admin')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar relatório consolidado PDF
+            </button>
+          </div>
+
+          <!-- DASHBOARD -->
+          <div id="adm-screen-dashboard" class="adm-screen active">
+            <div class="adm-top-cards" id="adm-top-cards"></div>
+            <div class="filter-bar" style="margin-bottom:18px">
+              <label>Parceiro:</label>
+              <select class="filter-select" id="adm-filtro-parceiro" onchange="admAplicarFiltro()">
+                <option value="TODOS">Todos os parceiros</option>
+              </select>
+              <div class="filtro-sep" style="height:22px;width:1px;background:#e0e0e0"></div>
+              <label>Período:</label>
+              <select class="filter-select" id="adm-filtro-mes" onchange="admAplicarFiltro()">
+                <option value="">Todos os meses</option>
+                <option value="01">Jan</option><option value="02">Fev</option><option value="03">Mar</option>
+                <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
+                <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
+                <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
+              </select>
+              <select class="filter-select" id="adm-filtro-ano" onchange="admAplicarFiltro()">
+                <option value="">Todos os anos</option>
+              </select>
+              <div class="filtro-sep" style="height:22px;width:1px;background:#e0e0e0"></div>
+              <div class="filter-tag" id="adm-filtro-status">
+                <button class="ftag active" data-status="TODOS" onclick="admFiltroStatus('TODOS',this)">Todos</button>
+                <button class="ftag" data-status="PAGO" onclick="admFiltroStatus('PAGO',this)">Pagos</button>
+                <button class="ftag" data-status="SEM_ACEITE" onclick="admFiltroStatus('SEM_ACEITE',this)">Sem Aceite</button>
+                <button class="ftag" data-status="PREVISTO" onclick="admFiltroStatus('PREVISTO',this)">Previstos</button>
+                <button class="ftag" data-status="EM ATRASO" onclick="admFiltroStatus('EM ATRASO',this)">Em Atraso</button>
+              </div>
+            </div>
+            <div class="adm-charts-row">
+              <div class="adm-chart-card">
+                <div class="adm-chart-title">Comissões por parceiro</div>
+                <div class="adm-legend" id="adm-leg-barras"></div>
+                <div style="position:relative;height:220px"><canvas id="adm-chart-barras" role="img" aria-label="Comissões pagas, previstas e em atraso por parceiro"></canvas></div>
+              </div>
+              <div class="adm-chart-card">
+                <div class="adm-chart-title">Participação no volume total</div>
+                <div class="adm-legend" id="adm-leg-pizza"></div>
+                <div style="position:relative;height:220px"><canvas id="adm-chart-pizza" role="img" aria-label="Distribuição percentual do volume de comissões por parceiro"></canvas></div>
+              </div>
+            </div>
+            <div class="adm-chart-card">
+              <div class="adm-chart-title">Status consolidado — todas as comissões empilhadas</div>
+              <div class="adm-legend" id="adm-leg-status"></div>
+              <div style="position:relative;height:160px"><canvas id="adm-chart-status" role="img" aria-label="Status consolidado das comissões por parceiro"></canvas></div>
+            </div>
+          </div>
+
+          <!-- PARCEIROS -->
+          <div id="adm-screen-parceiros" class="adm-screen">
+            <div class="filter-bar" style="margin-bottom:14px">
+              <label>Buscar:</label>
+              <input type="text" class="filter-select" id="adm-busca-parceiro" placeholder="Nome do parceiro..." oninput="admFiltrarCards()" style="min-width:200px">
+            </div>
+            <div class="admin-grid" id="adm-parceiros-grid"></div>
+          </div>
+
+          <!-- RELATÓRIO -->
+          <div id="adm-screen-relatorio" class="adm-screen">
+            <div class="filter-bar" style="margin-bottom:14px">
+              <label>Parceiro:</label>
+              <select class="filter-select" id="adm-rel-filtro" onchange="admRelFiltrar()">
+                <option value="TODOS">Todos</option>
+              </select>
+            </div>
+            <div class="adm-chart-card">
+              <div class="adm-chart-title">Rentabilidade estimada — R$ de honorário por R$ 1 de comissão paga</div>
+              <div style="position:relative;height:190px"><canvas id="adm-chart-rentab" role="img" aria-label="Rentabilidade estimada por parceiro"></canvas></div>
+            </div>
+            <div class="table-card" style="padding:18px;margin-bottom:0">
+              <h3 style="font-size:.82rem;color:var(--azul);margin-bottom:14px;text-transform:uppercase;letter-spacing:.3px">Resumo por parceiro</h3>
+              <table class="adm-rel-table"><thead><tr><th>Parceiro</th><th>Pago</th><th>Previsto</th><th>Em atraso</th><th>Vol. total</th><th>% Liquid.</th><th>Rentab.</th></tr></thead><tbody id="adm-rel-tbody"></tbody></table>
+            </div>
+          </div>
+
+          <!-- ALERTAS -->
+          <div id="adm-screen-alertas" class="adm-screen">
+            <div class="adm-alertas" id="adm-alertas-list"></div>
+          </div>
+
+          <!-- COMPARATIVO HONORÁRIOS vs COMISSÃO -->
+          <div id="adm-screen-comparativo" class="adm-screen">
+            <div class="filter-bar" style="margin-bottom:14px">
+              <label>Visualizar:</label>
+              <div class="filter-tag">
+                <button class="ftag active" onclick="admCompFiltro('todos',this)">Todos</button>
+                <button class="ftag" onclick="admCompFiltro('ativos',this)">Só ativos</button>
+                <button class="ftag" onclick="admCompFiltro('inativos',this)">Só inativos</button>
+              </div>
+            </div>
+            <div class="comp-card">
+              <div class="comp-title">
+                Honorários captados vs Comissão total
+                <span class="inativo-badge" id="adm-inativo-count">— inativos</span>
+              </div>
+              <div class="comp-subtitle">Parceiros sem indicação ativa são marcados em vermelho</div>
+              <div class="adm-legend" id="adm-leg-comp"></div>
+              <div style="position:relative;height:260px"><canvas id="adm-chart-comp" role="img" aria-label="Comparativo de honorários versus comissão por parceiro"></canvas></div>
+            </div>
+            <div class="comp-card">
+              <div class="comp-title">Taxa de comissão efetiva por parceiro (%)</div>
+              <div class="comp-subtitle">Percentual de comissão em relação ao honorário captado</div>
+              <div style="position:relative;height:200px"><canvas id="adm-chart-taxa" role="img" aria-label="Taxa de comissão efetiva por parceiro"></canvas></div>
+            </div>
+            <div class="table-card" style="padding:18px;margin-bottom:0">
+              <div class="filter-row">
+                <h3>Detalhamento — Honorários vs Comissão</h3>
+              </div>
+              <table class="adm-rel-table"><thead><tr><th>Parceiro</th><th>Status</th><th>Honorários Recebidos</th><th>Comissão Devida</th><th>Comissão Paga</th><th>Taxa %</th><th>Situação</th></tr></thead><tbody id="adm-comp-tbody">          <div id="adm-screen-usuarios" class="adm-screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+              <div style="font-size:.95rem;font-weight:800;color:var(--azul)">Gestão de Usuários do Sistema</div>
+              <button onclick="document.getElementById('modal-novo-user').style.display='flex'" style="padding:9px 18px;background:var(--azul);color:var(--dourado);border:none;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:700">➕ Novo Usuário</button>
+            </div>
+            <div style="background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px">
+              <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+                <thead><tr style="background:var(--azul)">
+                  <th style="padding:12px 16px;color:var(--dourado);text-align:left">Nome</th>
+                  <th style="padding:12px 16px;color:var(--dourado);text-align:left">E-mail</th>
+                  <th style="padding:12px 16px;color:var(--dourado);text-align:left">Perfil</th>
+                  <th style="padding:12px 16px;color:var(--dourado);text-align:left">Ação</th>
+                </tr></thead>
+                <tbody id="usuarios-tbody"></tbody>
+              </table>
+            </div>
+            <div style="background:#fffdf0;border:1.5px solid #f39c12;border-radius:10px;padding:16px 20px">
+              <div style="font-size:.82rem;font-weight:700;color:#b7950b;margin-bottom:6px">⚠️ Como salvar permanentemente</div>
+              <div style="font-size:.8rem;color:#666;line-height:1.7;margin-bottom:10px">Usuários criados ficam ativos enquanto o app está aberto. Após criar, copie o código abaixo e me mande para salvar no arquivo.</div>
+              <pre id="sys-users-code" style="background:#1a1a2e;color:#FED26C;padding:14px;border-radius:8px;font-size:.78rem;overflow-x:auto;margin:0">let SYS_USERS = [];</pre>
+            </div>
+          </div>
+
+</tbody></table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const GAS="https://script.google.com/macros/s/AKfycbxfYiwgZUYVdJURSx8Mrf36wiBduli_bNo4x9JOnmc-ksADeT9mWmM6s0zST1E_TF-p/exec";
+const ADMIN_USERS=["danielle@taticacontabilidade.com","fabianoazevedo@taticacontabilidade.com"],ADMIN_PASS="Tatica@2026",WPP_TATICA="558230243993";
+const ADMIN_USER=ADMIN_USERS[0];
+const ADMIN_NAMES={"danielle@taticacontabilidade.com":"Danielle","fabianoazevedo@taticacontabilidade.com":"Fabiano Azevedo","priscila@taticacontabilidade.com":"Priscila Galindo"};
+let SYS_USERS=[
+  {nome:"Beatriz Holanda", email:"comercial@taticacontabilidade.com", senha:"Tatica@2026", perfil:"comercial"},
+  {nome:"Priscila Galindo", email:"priscila@taticacontabilidade.com", senha:"Tatica@2026", perfil:"admin"},
+];
+function isAdminUser(e,p){if(ADMIN_USERS.some(a=>a.toLowerCase()===e.toLowerCase())&&p===ADMIN_PASS)return true;const u=SYS_USERS.find(u=>u.email.toLowerCase()===e.toLowerCase()&&u.perfil==="admin");return u&&u.senha===p;}
+function isComercialUser(e,p){const u=SYS_USERS.find(u=>u.email.toLowerCase()===e.toLowerCase()&&u.perfil==="comercial");return u&&u.senha===p?u:null;}
+function getAdminName(e){if(ADMIN_NAMES[e])return ADMIN_NAMES[e];const u=SYS_USERS.find(u=>u.email.toLowerCase()===e.toLowerCase());return u?u.nome:"Admin";}
+let _leadsData=[],_leadAtual=null;
+function getLeadEtapa(id){try{const e=JSON.parse(localStorage.getItem("tk_etapas")||"{}");return e[id]||"Novo";}catch(e){return"Novo";}}
+function saveLeadEtapa(id,etapa){try{const e=JSON.parse(localStorage.getItem("tk_etapas")||"{}");e[id]=etapa;localStorage.setItem("tk_etapas",JSON.stringify(e));}catch(e){}}
+function getLeadsHist(){try{return JSON.parse(localStorage.getItem("tk_hist")||"{}");}catch(e){return{};}}
+function saveLeadsHist(h){try{localStorage.setItem("tk_hist",JSON.stringify(h));}catch(e){}}
+let TOKEN=null,NOME=null,WPP=WPP_TATICA,PIX="—",CPF="";
+let todosInd=[],filtroAtual="TODOS";
+let PAR_FILTRO={atalho:"mes",mes:"",ano:"",cliente:""};
+let _modalPdfContexto="parceiro";
+
+async function api(p){
+  const r=await fetch(GAS+"?"+new URLSearchParams(p));
+  return r.json();
+}
+function fmt(v){return"R$\u00a0"+Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2});}
+function fmtK(v){return v>=1000?"R$"+(v/1000).toFixed(1)+"k":fmt(v);}
+
+async function doLogin(){
+  const u=document.getElementById("inp-user").value.trim();
+  const s=document.getElementById("inp-pass").value.trim();
+  const err=document.getElementById("login-err");
+  const btn=document.getElementById("btn-login");
+  if(!u||!s){err.textContent="Preencha e-mail e senha.";err.style.display="block";return;}
+  btn.textContent="Entrando...";btn.disabled=true;
+  if(isAdminUser(u,s)){
+    const admNome=getAdminName(u.toLowerCase());
+    document.getElementById("adm-nome-display").textContent=admNome+" — Admin";
+    document.getElementById("adm-nome-avatar").textContent=admNome;
+    document.getElementById("adm-user-avatar").textContent=admNome.charAt(0).toUpperCase();
+    document.getElementById("adm-user-role").textContent=admNome==="Danielle"?"Administradora":"Administrador";
+    document.getElementById("screen-login").style.display="none";
+    document.getElementById("app-admin").style.display="block";
+    carregarAdmin();renderUsuarios();btn.textContent="Entrar";btn.disabled=false;return;
+  }
+  const comUser=isComercialUser(u,s);
+  if(comUser){document.getElementById("com-nome-display").textContent=comUser.nome;document.getElementById("com-user-avatar").textContent=comUser.nome.charAt(0).toUpperCase();document.getElementById("screen-login").style.display="none";document.getElementById("app-comercial").style.display="block";comCarregar();btn.textContent="Entrar";btn.disabled=false;return;}
+  try{
+    const r=await api({action:"login",usuario:u,senha:s});
+    if(r.ok){
+      TOKEN=r.token;NOME=r.nome;WPP=r.wpp||WPP_TATICA;PIX=r.pix||"—";CPF=r.cpf||"";
+      err.style.display="none";
+      document.getElementById("screen-login").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("tb-nome-m").textContent=NOME;
+      document.getElementById("topbar-nome").textContent=NOME;
+      document.getElementById("sidebar-nome").textContent=NOME;
+      document.getElementById("user-avatar").textContent=NOME.charAt(0).toUpperCase();
+      document.getElementById("rec-nome").textContent=NOME;
+      document.getElementById("rec-pix").textContent=PIX;
+      carregarPainel();carregarRecibo();
+    } else {err.textContent=r.erro||"Usuário ou senha incorretos.";err.style.display="block";}
+  } catch(e){err.textContent="Erro de conexão: "+e.message;err.style.display="block";}
+  btn.textContent="Entrar";btn.disabled=false;
+}
+
+function doLogout(){
+  TOKEN=null;NOME=null;
+  document.getElementById("screen-login").style.display="flex";
+  document.getElementById("app").style.display="none";
+  document.getElementById("app-admin").style.display="none";
+  if(document.getElementById("app-comercial"))document.getElementById("app-comercial").style.display="none";
+  document.getElementById("inp-user").value="";
+  document.getElementById("inp-pass").value="";
+  document.getElementById("assin-ok").style.display="none";
+  document.getElementById("assin-area").style.display="block";
+  Object.keys(ADM_CHARTS).forEach(k=>{try{ADM_CHARTS[k].destroy();}catch(e){}});
+  ADM_CHARTS={};
+  Object.keys(PAR_CHARTS||{}).forEach(k=>{try{PAR_CHARTS[k].destroy();}catch(e){}});
+  PAR_CHARTS={};
+}
+
+const pageTitles={painel:"Painel & Relatório",aceite:"Aceite Digital",consulta:"Consulta de Indicações",clientes:"Meus Clientes",indicar:"Indicar Novo Cliente",faq:"Dúvidas Frequentes"};
+
+function toggleFaq(el){
+  const isOpen=el.classList.contains("open");
+  document.querySelectorAll(".faq-item.open").forEach(i=>i.classList.remove("open"));
+  if(!isOpen) el.classList.add("open");
+}
+function goTo(id,el){
+  document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
+  document.querySelectorAll(".snav,.mnav").forEach(n=>n.classList.remove("active"));
+  document.getElementById("screen-"+id).style.display="block";
+  document.querySelectorAll(`[onclick="goTo('${id}',this)"]`).forEach(b=>b.classList.add("active"));
+  document.getElementById("page-title").textContent=pageTitles[id]||"";
+  if(id==="painel") carregarPainel();
+  if(id==="clientes") carregarClientes();
+  if(id==="consulta") carregarConsulta();
+  if(id==="indicar") carregarIndicacoes();
+}
+
+let PAR_CHARTS={};
+let PAR_DADOS={totais:null,indicacoes:[],clientes:[],ativos:[],cancelados:[]};
+
+async function carregarPainel(){
+  const lst=document.getElementById("lista-ind");
+  lst.innerHTML='<div class="empty">Carregando...</div>';
+  try{
+    const [rCom,rCli]=await Promise.all([
+      api({action:"comissoes",token:TOKEN}),
+      api({action:"meusClientes",token:TOKEN})
+    ]);
+    if(!rCom.ok){lst.innerHTML=`<div class="empty">${rCom.erro||"Erro ao carregar."}</div>`;return;}
+
+    const totais=rCom.totais||{pago:0,previsto:0,atraso:0};
+    const indicacoes=rCom.indicacoes||[];
+    const clientes=rCli.ok?(rCli.clientes||[]):[];
+    const ativos=clientes.filter(c=>(c.situacao||"").toLowerCase()==="ativo");
+    const cancelados=clientes.filter(c=>["cancelado","perdido"].includes((c.situacao||"").toLowerCase()));
+
+    PAR_DADOS={totais,indicacoes,clientes,ativos,cancelados};
+    todosInd=indicacoes;
+
+    /* Cards de totais — serão atualizados pelo renderLista com filtro aplicado */
+    /* Sem Aceite separado */
+    const totSemAceite=indicacoes.filter(i=>i.status==="SEM_ACEITE").reduce((s,i)=>s+(i.valor||0),0);
+
+    /* Popular anos no filtro */
+    const anosSet=new Set(indicacoes.map(i=>(i.competencia||"").slice(-4)).filter(a=>a.match(/^\d{4}$/)));
+    const anoAtual=new Date().getFullYear();
+    [anoAtual-1,anoAtual,anoAtual+1].forEach(a=>anosSet.add(String(a)));
+    const selAno=document.getElementById("par-filtro-ano");
+    if(selAno&&selAno.options.length<=1){
+      [...anosSet].sort().forEach(a=>{const o=document.createElement("option");o.value=a;o.textContent=a;selAno.appendChild(o);});
+    }
+    /* Inicializa filtro de data com "Este mês" */
+    parAplicarAtalho("mes");
+
+    /* Destrói charts antigos */
+    Object.keys(PAR_CHARTS).forEach(k=>{try{PAR_CHARTS[k].destroy();}catch(e){}});
+    PAR_CHARTS={};
+
+    /* Gráfico de comissões (doughnut) */
+    const totSemAceiteChart=indicacoes.filter(i=>i.status==="SEM_ACEITE").reduce((s,i)=>s+(i.valor||0),0);
+    const gcCtx=document.getElementById("par-chart-comissoes");
+    if(gcCtx) PAR_CHARTS["comissoes"]=new Chart(gcCtx,{
+      type:"doughnut",
+      data:{labels:["Pago","Sem Aceite","Previsto","Em Atraso"],datasets:[{data:[totais.pago,totSemAceiteChart,totais.previsto,totais.atraso],backgroundColor:["#2ecc71","#f39c12","#3498db","#e74c3c"],borderWidth:2,hoverOffset:8}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{font:{size:11},padding:12}},tooltip:{callbacks:{label:c=>` ${c.label}: ${fmt(c.raw)}`}}}}
+    });
+
+    /* Gráfico de clientes (doughnut) */
+    const emAndamento=Math.max(0,clientes.length-ativos.length-cancelados.length);
+    const cliCtx=document.getElementById("par-chart-clientes");
+    if(cliCtx) PAR_CHARTS["clientes"]=new Chart(cliCtx,{
+      type:"doughnut",
+      data:{labels:["Ativos","Cancelados","Em Andamento"],datasets:[{data:[ativos.length,cancelados.length,emAndamento],backgroundColor:["#2ecc71","#e74c3c","#f39c12"],borderWidth:2,hoverOffset:8}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{font:{size:11},padding:12}}}}
+    });
+
+    /* Renderiza lista de indicações */
+    renderLista(filtroAtual||"TODOS");
+
+    /* Renderiza cards de clientes */
+    renderClientesCards(clientes);
+
+  } catch(e){lst.innerHTML='<div class="empty">Erro ao carregar dados.</div>';}
+}
+
+function renderClientesCards(clientes){
+  const el=document.getElementById("par-clientes-cards");
+  if(!el)return;
+  if(!clientes||!clientes.length){
+    el.innerHTML='<div class="par-cli-empty">Nenhum cliente registrado ainda.</div>';return;
+  }
+  el.innerHTML=clientes.map(c=>{
+    const sit=(c.situacao||"").toLowerCase();
+    const ativo=sit==="ativo";
+    const cancelado=["cancelado","perdido"].includes(sit);
+    const klass=ativo?"ativo":(cancelado?"cancelado":"");
+    const badgeClass=ativo?"badge-pago":(cancelado?"badge-atr":"badge-prev");
+    return`<div class="cli-mini-card ${klass}">
+      <div class="cli-mini-head">
+        <div class="cli-mini-nome">${c.cliente||"—"}</div>
+        <span class="badge ${badgeClass}">${c.situacao||"—"}</span>
+      </div>
+      <div class="cli-mini-stats">
+        <div class="cli-mini-stat">Data<span>${c.data||"—"}</span></div>
+        ${c.honorarios>0?`<div class="cli-mini-stat">Honorários<span>${fmt(c.honorarios)}/mês</span></div>`:""}
+        ${c.comissao>0?`<div class="cli-mini-stat">Comissão<span style="color:#1a8a4a">${fmt(c.comissao)}</span></div>`:""}
+        ${c.tipoServico?`<div class="cli-mini-stat">Tipo<span>${c.tipoServico}</span></div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function filtrar(st,el){
+  document.querySelectorAll(".filtros .filtro-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");filtroAtual=st;parFiltrarLista();
+}
+
+/* ── FILTROS PARCEIRO ── */
+function parSetAtalho(tipo,el){
+  PAR_FILTRO.atalho=tipo;
+  document.querySelectorAll("#par-atalhos-data .ftag").forEach(b=>b.classList.remove("active"));
+  if(el)el.classList.add("active");
+  parAplicarAtalho(tipo);
+}
+function parAplicarAtalho(tipo){
+  const hoje=new Date();
+  const mm=String(hoje.getMonth()+1).padStart(2,"0");
+  const yyyy=String(hoje.getFullYear());
+  const selM=document.getElementById("par-filtro-mes");
+  const selA=document.getElementById("par-filtro-ano");
+  if(tipo==="mes"){PAR_FILTRO.mes=mm;PAR_FILTRO.ano=yyyy;if(selM)selM.value=mm;if(selA)selA.value=yyyy;}
+  else if(tipo==="anterior"){
+    const ant=new Date(hoje.getFullYear(),hoje.getMonth()-1,1);
+    PAR_FILTRO.mes=String(ant.getMonth()+1).padStart(2,"0");PAR_FILTRO.ano=String(ant.getFullYear());
+    if(selM)selM.value=PAR_FILTRO.mes;if(selA)selA.value=PAR_FILTRO.ano;
+  }
+  else if(tipo==="3m"||tipo==="tudo"){PAR_FILTRO.mes="";PAR_FILTRO.ano=tipo==="tudo"?"":"";if(selM)selM.value="";if(selA)selA.value="";}
+  PAR_FILTRO.atalho=tipo;
+  parFiltrarLista();
+}
+function parSetMesAno(){
+  const mes=(document.getElementById("par-filtro-mes")?.value)||"";
+  const ano=(document.getElementById("par-filtro-ano")?.value)||"";
+  PAR_FILTRO.mes=mes;PAR_FILTRO.ano=ano;PAR_FILTRO.atalho="custom";
+  document.querySelectorAll("#par-atalhos-data .ftag").forEach(b=>b.classList.remove("active"));
+  parFiltrarLista();
+}
+function parFiltrarLista(){
+  PAR_FILTRO.cliente=(document.getElementById("par-filtro-cliente")?.value||"").toLowerCase().trim();
+  renderLista(filtroAtual||"TODOS");
+}
+
+const MESES_PT=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function compToMesAno(comp){
+  if(!comp) return {mes:"",ano:""};
+  const c=comp.trim().toLowerCase();
+  /* Formato por extenso: "março/2026" ou "março 2026" */
+  for(let i=0;i<MESES_PT.length;i++){
+    if(c.includes(MESES_PT[i])){
+      const m=String(i+1).padStart(2,"0");
+      const anoMatch=c.match(/\d{4}/);
+      return{mes:m,ano:anoMatch?anoMatch[0]:""};
+    }
+  }
+  /* Formato dd/mm/yyyy */
+  const dmY=comp.match(/\d{2}[\/\-](\d{2})[\/\-](\d{4})/);
+  if(dmY) return{mes:dmY[1],ano:dmY[2]};
+  /* Formato mm/yyyy */
+  const mY=comp.match(/^(\d{2})[\/\-](\d{4})$/);
+  if(mY) return{mes:mY[1],ano:mY[2]};
+  /* Formato yyyy-mm */
+  const Ym=comp.match(/(\d{4})[\/\-](\d{2})/);
+  if(Ym) return{mes:Ym[2],ano:Ym[1]};
+  return{mes:"",ano:""};
+}
+function parPagamentoMatch(pagamento){
+  /* Filtra pelo campo "pagamento" (data prevista de pagamento, ex: "20/05/2026") */
+  if(PAR_FILTRO.atalho==="tudo"||(!PAR_FILTRO.mes&&!PAR_FILTRO.ano)) return true;
+  const{mes:pMes,ano:pAno}=compToMesAno(pagamento||"");
+  if(PAR_FILTRO.atalho==="3m"){
+    const hoje=new Date();
+    for(let i=0;i<3;i++){
+      const d=new Date(hoje.getFullYear(),hoje.getMonth()-i,1);
+      const mm=String(d.getMonth()+1).padStart(2,"0");
+      const yy=String(d.getFullYear());
+      if(pMes===mm&&pAno===yy) return true;
+    }
+    return false;
+  }
+  if(PAR_FILTRO.mes&&PAR_FILTRO.ano) return pMes===PAR_FILTRO.mes&&pAno===PAR_FILTRO.ano;
+  if(PAR_FILTRO.mes&&!PAR_FILTRO.ano) return pMes===PAR_FILTRO.mes;
+  if(PAR_FILTRO.ano&&!PAR_FILTRO.mes) return pAno===PAR_FILTRO.ano;
+  return true;
+}
+
+function renderLista(st){
+  const lst=document.getElementById("lista-ind");
+  let dados=st==="TODOS"?todosInd:todosInd.filter(i=>i.status===st);
+  /* Filtro por data de pagamento */
+  dados=dados.filter(i=>parPagamentoMatch(i.pagamento));
+  /* Filtro de cliente */
+  if(PAR_FILTRO.cliente) dados=dados.filter(i=>(i.id||"").toLowerCase().includes(PAR_FILTRO.cliente));
+
+  /* Atualiza cards de totais com base nos dados filtrados */
+  const filtPago=dados.filter(i=>i.status==="PAGO").reduce((s,i)=>s+(i.valor||0),0);
+  const filtPrev=dados.filter(i=>i.status==="PREVISTO").reduce((s,i)=>s+(i.valor||0),0);
+  const filtAtr=dados.filter(i=>i.status==="EM ATRASO").reduce((s,i)=>s+(i.valor||0),0);
+  const filtSemAceite=dados.filter(i=>i.status==="SEM_ACEITE").reduce((s,i)=>s+(i.valor||0),0);
+  document.getElementById("tot-pago").textContent=dados.length||filtPago>0?fmt(filtPago):"—";
+  document.getElementById("tot-prev").textContent=dados.length||filtPrev>0?fmt(filtPrev):"—";
+  document.getElementById("tot-atr").textContent=dados.length||filtAtr>0?fmt(filtAtr):"—";
+  document.getElementById("tot-sem-aceite").textContent=dados.length||filtSemAceite>0?fmt(filtSemAceite):"—";
+
+  /* Atualiza gráfico de comissões com dados filtrados */
+  if(PAR_CHARTS["comissoes"]){
+    PAR_CHARTS["comissoes"].data.datasets[0].data=[filtPago,filtSemAceite,filtPrev,filtAtr];
+    PAR_CHARTS["comissoes"].update();
+  }
+
+  if(!dados.length){lst.innerHTML='<div class="empty">Sem dados para o filtro selecionado.</div>';return;}
+  const bMap={PAGO:"badge-pago",PREVISTO:"badge-prev","EM ATRASO":"badge-atr",SEM_ACEITE:"badge-aceite"};
+  const lMap={PAGO:"Pago",PREVISTO:"Previsto","EM ATRASO":"Em Atraso",SEM_ACEITE:"Sem Aceite"};
+  lst.innerHTML=`<table class="dt"><thead><tr><th>Cliente</th><th>Competência</th><th>Tipo</th><th>Parcela</th><th>Previsão</th><th>Comissão</th><th>Status</th></tr></thead><tbody>`+
+  dados.map(i=>`<tr><td style="font-weight:600">${i.id}</td><td>${i.competencia}</td><td>${i.tipo}</td><td>${i.parcela}</td><td>${i.pagamento}</td><td style="font-weight:700">${fmt(i.valor)}</td><td><span class="badge ${bMap[i.status]||"badge-prev"}">${lMap[i.status]||i.status}</span></td></tr>`).join("")+`</tbody></table>`;
+}
+
+async function carregarRecibo(){
+  try{
+    const jaAss=await api({action:"jaAssinou",token:TOKEN});
+    if(jaAss.assinou){
+      document.getElementById("mes-ref").textContent="";
+      document.getElementById("recibo-rows").innerHTML=`<div class="empty-recibo">✅ Você já assinou o recibo deste mês.<br><small>Registrado em: ${jaAss.em}</small></div>`;
+      document.getElementById("recibo-total-row").style.display="none";
+      document.getElementById("assin-area").style.display="none";return;
+    }
+    const r=await api({action:"recibo",token:TOKEN});
+    document.getElementById("mes-ref").textContent=r.ok?"Referente a: "+r.mes:"";
+    /* Apenas itens SEM_ACEITE — itens PREVISTO não aparecem no aceite */
+    const itensSemAceite=(r.itens||[]).filter(it=>it.semAceite||it.status==="SEM_ACEITE");
+    if(!r.ok||!itensSemAceite.length){
+      document.getElementById("recibo-rows").innerHTML='<div class="empty-recibo">Nenhum recibo pendente de aceite no momento.</div>';
+      document.getElementById("recibo-total-row").style.display="none";
+      document.getElementById("assin-area").style.display="none";return;
+    }
+    window._reciboItens=itensSemAceite.map(it=>({...it,valor:fmt(it.valor)}));
+    document.getElementById("recibo-rows").innerHTML=itensSemAceite.map(it=>`<div class="recibo-row"><span class="r-label">${it.id}<br><small style="color:#999">${it.tipo} · ${it.competencia} · Parc.${it.parcela}</small><span class="r-badge">Sem Aceite</span></span><span class="r-val">${fmt(it.valor)}</span></div>`).join("");
+    const totalSemAceite=itensSemAceite.reduce((s,it)=>s+(it.valor||0),0);
+    document.getElementById("recibo-total").textContent=fmt(typeof totalSemAceite==="number"?totalSemAceite:r.total);
+    document.getElementById("recibo-total-row").style.display="flex";
+    document.getElementById("assin-area").style.display="block";
+  } catch(e){document.getElementById("recibo-rows").innerHTML='<div class="empty-recibo">Erro ao carregar recibo.</div>';}
+}
+
+let _nomeAssin="",_cpfAssin="",_assinBase64="";
+function limparCpf(v){return v.replace(/\D/g,"");}
+function validarCPF(val){
+  const cpf=limparCpf(val);
+  const preview=document.getElementById("assin-preview");
+  const erro=document.getElementById("assin-erro");
+  erro.style.display="none";preview.style.display="none";
+  let f=cpf;
+  if(cpf.length<=11) f=cpf.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+  else f=cpf.replace(/(\d{2})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1/$2").replace(/(\d{4})(\d{1,2})$/,"$1-$2");
+  document.getElementById("inp-cpf").value=f;
+  if(cpf.length===11||cpf.length===14){
+    if(cpf!==(CPF||"").replace(/\D/g,"")){erro.textContent="⚠️ CPF/CNPJ não corresponde ao seu cadastro.";erro.style.display="block";return;}
+    _nomeAssin=NOME;_cpfAssin=f;gerarAssinaturaCanvas(NOME,f);
+  }
+}
+function gerarAssinaturaCanvas(nome,cpf){
+  const c=document.getElementById("cvs-assin");
+  const ctx=c.getContext("2d");
+  const W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff";ctx.fillRect(0,0,W,H);
+  ctx.save();let fs=40;ctx.font=`italic bold ${fs}px Georgia,serif`;
+  while(ctx.measureText(nome).width>W-40&&fs>18){fs-=2;ctx.font=`italic bold ${fs}px Georgia,serif`;}
+  ctx.fillStyle="#0D2026";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.shadowColor="rgba(0,0,0,.15)";ctx.shadowBlur=3;
+  ctx.translate(W/2,H/2-8);ctx.rotate(-0.04);ctx.fillText(nome,0,0);ctx.restore();
+  ctx.beginPath();ctx.moveTo(30,H-12);ctx.lineTo(W-30,H-12);ctx.strokeStyle="#0D2026";ctx.lineWidth=1;ctx.stroke();
+  _assinBase64=c.toDataURL("image/png");
+  document.getElementById("assin-nome-txt").textContent=nome+" · "+cpf;
+  document.getElementById("assin-preview").style.display="block";
+}
+
+async function assinar(){
+  const cpf=limparCpf(document.getElementById("inp-cpf").value);
+  const erro=document.getElementById("assin-erro");
+  if(cpf.length<11){erro.textContent="Digite seu CPF ou CNPJ completo.";erro.style.display="block";return;}
+  if(!_assinBase64){erro.textContent="CPF/CNPJ inválido.";erro.style.display="block";return;}
+  const btn=document.getElementById("btn-conf");
+  btn.textContent="Salvando...";btn.disabled=true;
+  try{
+    window._assinBase64=_assinBase64;
+    const ts=new Date().toLocaleString("pt-BR");window._tsAceite=ts;
+    const r=await api({action:"aceite",token:TOKEN,assinatura:"Assinado eletronicamente em "+ts,cpf:_cpfAssin,nomeAssin:_nomeAssin});
+    if(!r.ok) throw new Error(r.erro||"Erro");
+    setTimeout(()=>{
+      document.getElementById("assin-area").style.display="none";
+      document.getElementById("assin-ok").style.display="block";
+      document.getElementById("assin-ok-ts").textContent="Registrado em "+ts+" · "+_nomeAssin;
+    },800);
+  } catch(e){alert("Erro ao salvar. Tente novamente.");}
+  btn.textContent="Confirmar Aceite";btn.disabled=false;
+}
+
+function gerarPDF(){
+  const total=document.getElementById("recibo-total").textContent;
+  const mes=document.getElementById("mes-ref").textContent;
+  const ts=window._tsAceite||new Date().toLocaleString("pt-BR");
+  const assin=window._assinBase64||"";
+  const dataHoje=new Date().toLocaleDateString("pt-BR");
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><style>body{font-family:Arial,sans-serif;max-width:750px;margin:0 auto;padding:30px;color:#222;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:4px}.logo-wrap{background:#0D2026;border-radius:10px;padding:10px;width:100px;height:100px;display:flex;align-items:center;justify-content:center}.logo{width:80px;height:80px;object-fit:contain}.titulo{font-size:1rem;font-weight:700;color:#0D2026;text-align:right}.linha{height:3px;background:linear-gradient(90deg,#FED26C,#0D2026);margin-bottom:18px}.bloco{background:#f8f9fa;border-radius:6px;padding:12px;margin-bottom:14px;font-size:.88rem;line-height:1.9}.bloco strong{color:#0D2026}table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:14px}th{background:#0D2026;color:#FED26C;padding:9px 11px;text-align:left}td{padding:8px 11px;border-bottom:1px solid #eee}.tr td{background:#0D2026;color:#fff;font-weight:700}.tr td:last-child{color:#FED26C;text-align:right}.decl{font-size:.85rem;color:#444;margin:16px 0;line-height:1.8;padding:12px;background:#fffdf0;border-left:4px solid #FED26C}.assin-wrap{margin-top:36px;display:flex;justify-content:center}.assin-box{text-align:center;width:300px;border-top:1px solid #999;padding-top:10px}.footer{margin-top:26px;border-top:1px solid #eee;padding-top:12px;font-size:.74rem;color:#888;text-align:center;line-height:2}@media print{button{display:none}}</style></head><body>
+  <div class="header"><div class="logo-wrap"><img class="logo" src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática Gestão Contábil"/></div><div class="titulo">RECIBO – CENTRAL DE<br>PARCEIROS TÁTICA</div></div>
+  <div class="linha"></div>
+  <div class="bloco"><strong>Pagador:</strong> Tática Gestão Contábil · CNPJ: 18.809.456/0001-62<br><strong>Recebedor:</strong> ${NOME}<br><strong>CPF/CNPJ:</strong> ${CPF||"—"}<br><strong>Chave PIX:</strong> ${PIX||"—"}</div>
+  <div class="bloco"><strong>${mes}</strong></div>
+  <table><thead><tr><th>Cliente</th><th>Tipo</th><th>Competência</th><th>Parcela</th><th>Previsão</th><th style="text-align:right">Comissão</th></tr></thead><tbody id="pdf-rows"></tbody><tfoot><tr class="tr"><td colspan="5"><strong>Total a Receber</strong></td><td style="text-align:right"><strong>${total}</strong></td></tr></tfoot></table>
+  <div class="decl">Declaro que recebi da Tática Gestão Contábil a quantia de <strong>${total}</strong>, correspondente à comissão do Programa Central de Parceiros.<br><br><strong>Forma de Pagamento:</strong> PIX — ${PIX||"—"}<br><strong>Local e Data:</strong> Maceió, ${dataHoje}.</div>
+  <div class="assin-wrap"><div class="assin-box">${assin?`<img src="${assin}" style="max-width:260px;max-height:70px;display:block;margin:0 auto 6px"/>`:""}
+  <div style="font-weight:700;color:#0D2026">${NOME}</div><div style="font-size:.7rem;color:#888;margin-top:3px">Assinado em: ${ts}</div></div></div>
+  <div class="footer">📧 financeiro@taticacontabilidade.com &nbsp;|&nbsp; 📍 Rua Machado Lemos, 226 – Maceió/AL &nbsp;|&nbsp; 📞 (82) 3024-3993</div>
+  <script>const it=${JSON.stringify(window._reciboItens||[])};const tb=document.getElementById("pdf-rows");if(it.length)tb.innerHTML=it.map(i=>'<tr><td>'+(i.id||"—")+'</td><td>'+(i.tipo||"—")+'</td><td>'+(i.competencia||"—")+'</td><td>'+(i.parcela||"—")+'</td><td>'+(i.pagamento||i.previsao||"—")+'</td><td style="text-align:right">'+(i.valor||"")+'</td></tr>').join('');window.onload=()=>window.print();<\/script></body></html>`;
+  const w=window.open("","_blank");w.document.write(html);w.document.close();
+}
+
+function stLabel(s){
+  const m={PAGO:"badge-pago",PREVISTO:"badge-prev","EM ATRASO":"badge-atr",SEM_ACEITE:"badge-aceite"};
+  const l={PAGO:"Pago ✓",PREVISTO:"Previsto","EM ATRASO":"Em Atraso",SEM_ACEITE:"Sem Aceite"};
+  return`<span class="badge ${m[s]||"badge-prev"}">${l[s]||s}</span>`;
+}
+
+async function buscar(){
+  /* Substituído por filtrarConsulta() na nova aba Consulta */
+  filtrarConsulta();
+}
+
+let _clientesDados=[];
+let _clientesFiltro="ativo";
+let _clientesIndicacoes=[];
+
+function filtrarClientes(tipo,el){
+  document.querySelectorAll("#screen-clientes .filtro-btn").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  _clientesFiltro=tipo;
+  renderClientes();
+}
+
+function renderClientes(){
+  const lst=document.getElementById("lista-clientes");
+  const norm=s=>(s||"").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+  /* Monta lista com lógica de liquidado:
+     - situacao "liquidado" na planilha  OU
+     - situacao "ativo" mas com 12 parcelas pagas (todas concluídas) */
+  const lista=_clientesDados.filter(c=>{
+    const sit=(c.situacao||"").toLowerCase();
+    if(_clientesFiltro==="liquidado"){
+      if(sit==="liquidado"||sit==="liquidados") return true;
+      /* Ativo com todas as parcelas pagas */
+      if(sit==="ativo"){
+        const total12=c.totalParcelas||12;
+        const nomeCliente=norm(c.cliente);
+        const parc=_clientesIndicacoes.filter(i=>norm(i.id)===nomeCliente);
+        const pagas=parc.filter(i=>i.status==="PAGO").length;
+        return pagas>=total12&&total12>0;
+      }
+      return false;
+    }
+    if(_clientesFiltro==="ativo"){
+      if(sit!=="ativo") return false;
+      /* Não mostrar nos ativos quem já liquidou */
+      const total12=c.totalParcelas||12;
+      const nomeCliente=norm(c.cliente);
+      const parc=_clientesIndicacoes.filter(i=>norm(i.id)===nomeCliente);
+      const pagas=parc.filter(i=>i.status==="PAGO").length;
+      return !(pagas>=total12&&total12>0);
+    }
+    return sit===_clientesFiltro; /* cancelado */
+  });
+
+  if(!lista.length){
+    const msgs={ativo:"Nenhum cliente ativo ainda.",cancelado:"Nenhum cliente cancelado.",liquidado:"Nenhum cliente concluiu todas as parcelas ainda."};
+    lst.innerHTML=`<div class="empty" style="padding:30px;text-align:center;background:#fff;border-radius:0 0 14px 14px">${msgs[_clientesFiltro]||""}</div>`;
+    return;
+  }
+
+  const cores={ativo:"#2ecc71",cancelado:"#e74c3c",liquidado:"#7F77DD",liquidados:"#7F77DD"};
+  const badgeClasses={ativo:"badge-pago",cancelado:"badge-atr",liquidado:"badge-liquidado"};
+  const badgeLabels={ativo:"Ativo",cancelado:"Cancelado",liquidado:"Concluído",liquidados:"Concluído"};
+  const cor=cores[_clientesFiltro]||"#2ecc71";
+
+  const html=lista.map(c=>{
+    const nomeCliente=norm(c.cliente);
+    const parc=_clientesIndicacoes.filter(i=>norm(i.id)===nomeCliente);
+    const total12=c.totalParcelas||12;
+    const pagas=parc.filter(i=>i.status==="PAGO").length;
+    const previstas=parc.filter(i=>i.status==="PREVISTO").length;
+    const atrasadas=parc.filter(i=>i.status==="EM ATRASO").length;
+    const semAceite=parc.filter(i=>i.status==="SEM_ACEITE").length;
+    const pct=total12>0?Math.min(100,Math.round((pagas/total12)*100)):0;
+    const temParcelas=parc.length>0;
+    const liquidado=_clientesFiltro==="liquidado";
+    const progBar=`
+      <div class="mc-prog-wrap">
+        <div class="mc-prog-info">
+          <span>${liquidado&&pct===100?`✅ Todas as ${total12} parcelas concluídas (100%)`:`${temParcelas?pagas:0}/${total12} parcelas concluídas (${pct}%)`}</span>
+          <span>${temParcelas?parc.length+" registros":"Aguardando início"}</span>
+        </div>
+        <div class="mc-prog-bar-bg"><div class="mc-prog-bar-fill" style="width:${pct}%;background:${cor}"></div></div>
+        <div class="mc-badges-row">
+          ${pagas>0?`<span class="mc-parc-badge mc-parc-pago">${pagas} paga${pagas>1?"s":""}</span>`:""}
+          ${previstas>0?`<span class="mc-parc-badge mc-parc-prev">${previstas} prevista${previstas>1?"s":""}</span>`:""}
+          ${atrasadas>0?`<span class="mc-parc-badge mc-parc-atr">${atrasadas} em atraso</span>`:""}
+          ${semAceite>0?`<span class="mc-parc-badge mc-parc-aceite">${semAceite} sem aceite</span>`:""}
+          ${!temParcelas?`<span class="mc-parc-badge" style="background:#f0f0f0;color:#999">Sem parcelas registradas</span>`:""}
+        </div>
+      </div>`;
+    return`<div class="mc-card" style="border-left:4px solid ${cor}">
+      <div class="mc-card-head">
+        <div>
+          <div class="mc-nome">${c.cliente||"—"}</div>
+          <div class="mc-data-ind">Indicação: ${c.data||"—"}</div>
+        </div>
+        <span class="badge ${badgeClasses[_clientesFiltro]}">${badgeLabels[_clientesFiltro]}</span>
+      </div>
+      <div class="mc-vals">
+        ${c.honorarios>0?`<div class="mc-val-item"><div class="mc-val-label">Honorários</div><div class="mc-val-num">${fmt(c.honorarios)}<small style="font-weight:400;font-size:.7rem">/mês</small></div></div>`:""}
+        ${c.comissao>0?`<div class="mc-val-item"><div class="mc-val-label">Comissão</div><div class="mc-val-num" style="color:#1a8a4a">${fmt(c.comissao)}</div></div>`:""}
+        ${c.tipoServico?`<div class="mc-val-item"><div class="mc-val-label">Tipo</div><div class="mc-val-num" style="font-size:.8rem;font-weight:600">${c.tipoServico}</div></div>`:""}
+      </div>
+      ${progBar}
+    </div>`;
+  }).join("");
+  lst.innerHTML=`<div class="mc-cards" style="padding:16px 20px">${html}</div>`;
+}
+
+async function carregarClientes(){
+  const lst=document.getElementById("lista-clientes");
+  lst.innerHTML='<div class="empty" style="padding:30px;text-align:center">Carregando...</div>';
+  try{
+    const [rCli,rCom]=await Promise.all([
+      api({action:"meusClientes",token:TOKEN}),
+      api({action:"comissoes",token:TOKEN})
+    ]);
+    if(!rCli.ok){lst.innerHTML=`<div class="empty" style="padding:30px;text-align:center">${rCli.erro}</div>`;return;}
+    /* Ativo, Cancelado e Liquidado — Perdido fica na aba Consulta */
+    _clientesDados=(rCli.clientes||[]).filter(c=>["ativo","cancelado","liquidado","liquidados"].includes((c.situacao||"").toLowerCase()));
+    _clientesIndicacoes=(rCom.ok&&rCom.indicacoes)||[];
+    renderClientes();
+  } catch(e){lst.innerHTML='<div class="empty" style="padding:30px;text-align:center">Erro ao carregar.</div>';}
+}
+
+let _consultaDados=[];
+async function carregarConsulta(){
+  const lst=document.getElementById("consulta-lista");
+  if(!lst)return;
+  lst.innerHTML='<div class="empty" style="padding:30px;text-align:center">Carregando...</div>';
+  try{
+    const r=await api({action:"meusClientes",token:TOKEN});
+    if(!r.ok){lst.innerHTML=`<div class="empty" style="padding:30px;text-align:center">${r.erro}</div>`;return;}
+    /* Consulta = somente prospecção: tudo EXCETO Ativo e Cancelado */
+    const SITS_CLIENTES=["ativo","cancelado"];
+    _consultaDados=(r.clientes||[]).filter(c=>!SITS_CLIENTES.includes((c.situacao||"").toLowerCase()));
+    renderConsulta(_consultaDados);
+  } catch(e){lst.innerHTML='<div class="empty" style="padding:30px;text-align:center">Erro ao carregar.</div>';}
+}
+
+/* Timeline: Nova Indicação → Em Contato → Em Negociação → Fechado  (+ Perdido como desvio) */
+const TL_ETAPAS=["Nova Indicação","Em Contato","Em Negociação","Fechado"];
+const TL_ICONS=["🆕","📞","🤝","✅"];
+function etapaIndex(sit){
+  const s=(sit||"").toLowerCase();
+  if(s==="fechado") return 3;
+  if(s==="em negociação"||s==="negociação") return 2;
+  if(s==="em contato"||s==="contato") return 1;
+  return 0; /* nova indicação ou perdido */
+}
+
+function renderConsulta(lista){
+  const lst=document.getElementById("consulta-lista");
+  if(!lista||!lista.length){lst.innerHTML='<div class="empty" style="padding:30px;text-align:center;background:#fff;border-radius:14px">Nenhuma indicação em prospecção encontrada.</div>';return;}
+  const stBadge=s=>{
+    const sl=(s||"").toLowerCase();
+    const m={"fechado":"badge-pago","em contato":"badge-prev","em negociação":"badge-prev","perdido":"badge-atr"};
+    return`<span class="badge ${m[sl]||"badge-aceite"}">${s||"—"}</span>`;
+  };
+  lst.innerHTML=lista.map(c=>{
+    const sit=(c.situacao||"").toLowerCase();
+    const perdido=sit==="perdido";
+    const idx=perdido?-1:etapaIndex(c.situacao);
+    let tl;
+    if(perdido){
+      /* Mostra timeline com linha cortada e indicação de perdido */
+      tl=`<div style="display:flex;align-items:center;gap:10px;padding:6px 0">
+        <span style="font-size:1.2rem">❌</span>
+        <span style="font-size:.78rem;color:#a93226;font-weight:600">Indicação não convertida — cliente optou por não contratar</span>
+      </div>`;
+    } else {
+      tl=TL_ETAPAS.map((et,i)=>{
+        const done=i<idx;const curr=i===idx;
+        return`<div class="tl-step${done?" done":""}${curr?" current":""}">
+          <div class="tl-dot">${done?"✓":TL_ICONS[i]}</div>
+          <div class="tl-label">${et}</div>
+        </div>`;
+      }).join("");
+      tl=`<div class="timeline">${tl}</div>`;
+    }
+    return`<div class="consulta-ind-card">
+      <div class="ci-head">
+        <div>
+          <div class="ci-nome">${c.cliente||"—"}</div>
+          ${c.tipoServico?`<div class="ci-tipo">📂 ${c.tipoServico}</div>`:""}
+        </div>
+        <div style="text-align:right">
+          ${stBadge(c.situacao)}
+          <div class="ci-data" style="margin-top:4px">Desde ${c.data||"—"}</div>
+        </div>
+      </div>
+      ${tl}
+    </div>`;
+  }).join("");
+}
+
+function filtrarConsulta(){
+  const q=(document.getElementById("inp-busca")?.value||"").toLowerCase().trim();
+  if(!q){renderConsulta(_consultaDados);return;}
+  renderConsulta(_consultaDados.filter(c=>(c.cliente||"").toLowerCase().includes(q)));
+}
+
+async function carregarIndicacoes(){
+  /* Mantido vazio — lista foi transferida para aba Consulta */
+}
+
+
+async function enviarIndicacao(){
+  const nome=document.getElementById("ind-nome").value.trim();
+  const erro=document.getElementById("ind-erro");const ok=document.getElementById("ind-ok");
+  erro.style.display="none";ok.style.display="none";
+  if(!nome){erro.textContent="Informe o nome do cliente.";erro.style.display="block";return;}
+  const btn=document.getElementById("btn-indicar");btn.textContent="Enviando...";btn.disabled=true;
+  try{
+    const r=await api({action:"indicarCliente",token:TOKEN,nomeCliente:nome,
+      email:document.getElementById("ind-email").value.trim(),
+      telefone:document.getElementById("ind-tel").value.trim(),
+      tipoServico:document.getElementById("ind-tipo").value.trim(),
+      mensagem:document.getElementById("ind-msg").value.trim()});
+    if(r.ok){
+      ok.style.display="block";
+      ["ind-nome","ind-email","ind-tel","ind-tipo","ind-msg"].forEach(id=>document.getElementById(id).value="");
+      carregarIndicacoes();
+    } else {erro.textContent=r.erro||"Erro ao enviar.";erro.style.display="block";}
+  } catch(e){erro.textContent="Erro de conexão.";erro.style.display="block";}
+  btn.textContent="Enviar Indicação";btn.disabled=false;
+}
+
+/* ===== ADMIN — NAVEGAÇÃO ===== */
+const ADM_PT={dashboard:"Dashboard",parceiros:"Parceiros",relatorio:"Relatório de Rentabilidade",alertas:"Alertas",comparativo:"Comparativo Honorários vs Comissão",usuarios:"Usuários do Sistema"};
+let ADM_CHARTS={};
+let ADM_DADOS={parc:[],pagoV:[],prevV:[],atrV:[],totV:[],nomes:[]};
+let ADM_FILTRO_PARC="TODOS",ADM_FILTRO_STATUS="TODOS",ADM_FILTRO_COMP="todos";
+
+function admGoTo(id,el){
+  document.querySelectorAll(".adm-screen").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll("#app-admin .snav").forEach(n=>n.classList.remove("active"));
+  const screen=document.getElementById("adm-screen-"+id);
+  if(id==="usuarios")renderUsuarios();
+  if(screen)screen.classList.add("active");
+  if(el)el.classList.add("active");
+  document.getElementById("adm-page-title").textContent=ADM_PT[id]||"";
+}
+
+function admMakeChart(id,type,labels,datasets,extraOpts){
+  if(ADM_CHARTS[id])try{ADM_CHARTS[id].destroy();}catch(e){}
+  const ctx=document.getElementById(id);if(!ctx)return;
+  const gc="rgba(0,0,0,0.07)",tc="#888";
+  const base={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+fmtK(c.raw)}}},
+    scales:{x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
+            y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>fmtK(v)}}}};
+  if(type==="doughnut"||type==="pie")delete base.scales;
+  ADM_CHARTS[id]=new Chart(ctx,{type,data:{labels,datasets},options:Object.assign({},base,extraOpts||{})});
+}
+
+function admBuildLegend(elId,labels,cores){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=labels.map((l,i)=>`<span><span class="adm-leg-dot" style="background:${cores[i%cores.length]}"></span>${l}</span>`).join("");
+}
+
+function admIni(n){return n.split(" ").filter(Boolean).slice(0,2).map(p=>p[0]).join("").toUpperCase();}
+const ADM_CORES=["#378ADD","#1D9E75","#D85A30","#D4537E","#7F77DD","#BA7517","#639922","#E24B4A"];
+const WPP_SVG=`<svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.522 5.847L.057 23.882l6.19-1.622A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.793 9.793 0 01-4.988-1.365l-.358-.214-3.71.973.99-3.614-.233-.372A9.794 9.794 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>`;
+
+/* ── MODAL PDF ── */
+function abrirModalPdf(ctx){
+  _modalPdfContexto=ctx;
+  document.getElementById("modal-pdf").classList.add("open");
+}
+function fecharModalPdf(){
+  document.getElementById("modal-pdf").classList.remove("open");
+}
+function confirmarPdf(tipo){
+  fecharModalPdf();
+  if(_modalPdfContexto==="parceiro") gerarPdfRelatorioParceiro(tipo==="filtrado");
+  else gerarPdfRelatorioAdmin(tipo==="filtrado");
+}
+
+/* ── FILTROS ADMIN ── */
+function admAplicarFiltro(){
+  ADM_FILTRO_PARC=document.getElementById("adm-filtro-parceiro").value;
+  admRenderDashboard();
+}
+function admFiltroStatus(st,el){
+  ADM_FILTRO_STATUS=st;
+  document.querySelectorAll("#adm-filtro-status .ftag").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  admRenderDashboard();
+}
+function admFiltrarCards(){
+  const q=(document.getElementById("adm-busca-parceiro")?.value||"").toLowerCase();
+  document.querySelectorAll("#adm-parceiros-grid .adm-pc-card").forEach(c=>{
+    c.style.display=c.dataset.nome.includes(q)?"":"none";
+  });
+}
+function admRelFiltrar(){
+  const sel=document.getElementById("adm-rel-filtro").value;
+  admRenderRelatorio(sel);
+}
+function admCompFiltro(tipo,el){
+  ADM_FILTRO_COMP=tipo;
+  document.querySelectorAll("#adm-screen-comparativo .ftag").forEach(b=>b.classList.remove("active"));
+  el.classList.add("active");
+  admRenderComparativo();
+}
+
+function admRenderDashboard(){
+  const {parc,pagoV,prevV,atrV,totV,nomes}=ADM_DADOS;
+  let idx=parc.map((_,i)=>i);
+  if(ADM_FILTRO_PARC!=="TODOS") idx=idx.filter(i=>parc[i].usuario===ADM_FILTRO_PARC);
+
+  const fn=arr=>idx.map(i=>arr[i]);
+  const _nomes=fn(nomes), _pago=fn(pagoV), _prev=fn(prevV), _atr=fn(atrV), _tot=fn(totV);
+
+  /* aplica filtro de status */
+  let ds;
+  if(ADM_FILTRO_STATUS==="PAGO") ds=[{label:"Pago",data:_pago,backgroundColor:"#2ecc71",borderRadius:4}];
+  else if(ADM_FILTRO_STATUS==="PREVISTO") ds=[{label:"Previsto",data:_prev,backgroundColor:"#3498db",borderRadius:4}];
+  else if(ADM_FILTRO_STATUS==="EM ATRASO") ds=[{label:"Em atraso",data:_atr,backgroundColor:"#e74c3c",borderRadius:4}];
+  else ds=[
+    {label:"Pago",data:_pago,backgroundColor:"#2ecc71",borderRadius:4},
+    {label:"Previsto",data:_prev,backgroundColor:"#3498db",borderRadius:4},
+    {label:"Em atraso",data:_atr,backgroundColor:"#e74c3c",borderRadius:4}
+  ];
+
+  admBuildLegend("adm-leg-barras",ADM_FILTRO_STATUS==="TODOS"?["Pago","Previsto","Em atraso"]:[ADM_FILTRO_STATUS==="PAGO"?"Pago":ADM_FILTRO_STATUS==="PREVISTO"?"Previsto":"Em atraso"],
+    ADM_FILTRO_STATUS==="TODOS"?["#2ecc71","#3498db","#e74c3c"]:[ADM_FILTRO_STATUS==="PAGO"?"#2ecc71":ADM_FILTRO_STATUS==="PREVISTO"?"#3498db":"#e74c3c"]);
+  admMakeChart("adm-chart-barras","bar",_nomes,ds,{scales:{x:{grid:{display:false}},y:{}}});
+
+  admBuildLegend("adm-leg-pizza",_nomes,ADM_CORES);
+  admMakeChart("adm-chart-pizza","doughnut",_nomes,[
+    {data:_tot,backgroundColor:ADM_CORES.slice(0,_nomes.length),borderWidth:2,hoverOffset:8}
+  ],{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${fmtK(c.raw)}`}}}});
+
+  admBuildLegend("adm-leg-status",["Pago","Previsto","Em atraso"],["#2ecc71","#3498db","#e74c3c"]);
+  admMakeChart("adm-chart-status","bar",_nomes,[
+    {label:"Pago",data:_pago,backgroundColor:"#2ecc71",borderRadius:0},
+    {label:"Previsto",data:_prev,backgroundColor:"#3498db",borderRadius:0},
+    {label:"Em atraso",data:_atr,backgroundColor:"#e74c3c",borderRadius:0}
+  ],{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true}}});
+}
+
+function admRenderRelatorio(filtroParc){
+  const {parc,pagoV,prevV,atrV,totV,nomes}=ADM_DADOS;
+  let idx=parc.map((_,i)=>i);
+  if(filtroParc&&filtroParc!=="TODOS") idx=idx.filter(i=>parc[i].usuario===filtroParc);
+
+  const _nomes=idx.map(i=>nomes[i]);
+  const rentV=idx.map(i=>pagoV[i]>0?5.0:0);
+
+  admMakeChart("adm-chart-rentab","bar",_nomes,[
+    {data:rentV,backgroundColor:rentV.map(v=>v>=2?"#2ecc71":"#e74c3c"),borderRadius:4}
+  ],{plugins:{tooltip:{callbacks:{label:c=>` R$ ${Number(c.raw).toFixed(2)} por R$1 de comissão`}}},
+    scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>"R$ "+v.toFixed(1)}}}});
+
+  document.getElementById("adm-rel-tbody").innerHTML=idx.map(i=>{
+    const p=parc[i];const tot=totV[i];const prog=tot>0?Math.round((pagoV[i]/tot)*100):0;
+    const rentPos=pagoV[i]>0;
+    return`<tr>
+      <td style="font-weight:700">${p.nome}<br><small style="color:#999;font-weight:400">${p.usuario}</small></td>
+      <td style="color:#1a8a4a;font-weight:600">${fmt(p.pago||0)}</td>
+      <td style="color:#1a6aa5;font-weight:600">${fmt(p.previsto||0)}</td>
+      <td style="color:${(p.atraso||0)>0?"#a93226":"#888"};font-weight:600">${fmt(p.atraso||0)}</td>
+      <td style="font-weight:600">${fmt(tot)}</td>
+      <td>${prog}%<div style="height:4px;background:#eee;border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;background:#2ecc71;width:${prog}%;border-radius:2px"></div></div></td>
+      <td><span class="rentab-pill ${rentPos?"pill-pos":"pill-neg"}">${rentPos?"R$ 5.0 / R$1":"—"}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+function admRenderComparativo(){
+  const {parc,pagoV,prevV,atrV,totV,nomes}=ADM_DADOS;
+
+  /* Identifica inativos: pago=prev=atr=0 */
+  const inativos=parc.map((_,i)=>totV[i]===0);
+  const inativoCount=inativos.filter(Boolean).length;
+  document.getElementById("adm-inativo-count").textContent=`${inativoCount} ${inativoCount===1?"inativo":"inativos"}`;
+
+  let idx=parc.map((_,i)=>i);
+  if(ADM_FILTRO_COMP==="ativos") idx=idx.filter(i=>!inativos[i]);
+  if(ADM_FILTRO_COMP==="inativos") idx=idx.filter(i=>inativos[i]);
+
+  const _nomes=idx.map(i=>nomes[i]);
+
+  /* Honorários REAIS recebidos pela contabilidade → campo honorariosRecebidos/honorarios da API
+     Comissão devida ao parceiro → pago + previsto + atraso (todas as parcelas)
+     Comissão paga ao parceiro   → apenas pagoV (status PAGO) */
+  const honRealV=idx.map(i=>ADM_DADOS.honRecV[i]||0);
+  const comDevidaV=idx.map(i=>ADM_DADOS.comDevidaV[i]||0);
+  const comPagaV=idx.map(i=>pagoV[i]);
+
+  const bgHon=idx.map(i=>inativos[i]?"rgba(231,76,60,.25)":"rgba(52,152,219,.7)");
+  const bgComDev=idx.map(i=>inativos[i]?"rgba(231,76,60,.3)":"rgba(243,156,18,.7)");
+  const bgComPag=idx.map(i=>inativos[i]?"rgba(231,76,60,.5)":"rgba(46,204,113,.7)");
+
+  admBuildLegend("adm-leg-comp",
+    ["Honorários recebidos (real)","Comissão devida","Comissão paga","(vermelho = sem indicações)"],
+    ["rgba(52,152,219,.7)","rgba(243,156,18,.7)","rgba(46,204,113,.7)","rgba(231,76,60,.5)"]);
+  admMakeChart("adm-chart-comp","bar",_nomes,[
+    {label:"Honorários recebidos",data:honRealV,backgroundColor:bgHon,borderRadius:4},
+    {label:"Comissão devida",data:comDevidaV,backgroundColor:bgComDev,borderRadius:4},
+    {label:"Comissão paga",data:comPagaV,backgroundColor:bgComPag,borderRadius:4}
+  ],{scales:{x:{grid:{display:false}},y:{}},
+    plugins:{tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtK(c.raw)}`}}}});
+
+  /* Taxa de comissão % real = comissão devida ÷ honorários recebidos */
+  const taxaV=idx.map((i,k)=>honRealV[k]>0?Math.round((comDevidaV[k]/honRealV[k])*1000)/10:0);
+  admMakeChart("adm-chart-taxa","bar",_nomes,[
+    {data:taxaV,backgroundColor:taxaV.map(v=>v>0?"#3498db":"#ccc"),borderRadius:4}
+  ],{plugins:{tooltip:{callbacks:{label:c=>` ${Number(c.raw).toFixed(1)}%`}}},
+    scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>v+"%"}}}});
+
+  /* Tabela: Parceiro | Status | Hon. Recebidos | Comissão Devida | Comissão Paga | Taxa% | Situação */
+  document.getElementById("adm-comp-tbody").innerHTML=idx.map((i,k)=>{
+    const p=parc[i];
+    const honReal=honRealV[k];
+    const comDevida=comDevidaV[k];
+    const comPaga=comPagaV[k];
+    const taxa=taxaV[k];
+    const inativo=inativos[i];
+    return`<tr style="${inativo?"background:#fff5f5":""}">
+      <td style="font-weight:700">${p.nome}</td>
+      <td><span class="badge ${inativo?"badge-atr":"badge-pago"}">${inativo?"Inativo":"Ativo"}</span></td>
+      <td style="color:#1a6aa5;font-weight:600">${honReal>0?fmt(honReal):'<span style="color:#bbb">—</span>'}</td>
+      <td style="color:#d68910;font-weight:600">${fmt(comDevida)}</td>
+      <td style="color:#1a8a4a;font-weight:600">${fmt(comPaga)}</td>
+      <td><span class="rentab-pill ${taxa>0?"pill-pos":"pill-neg"}">${taxa>0?taxa.toFixed(1)+"%":"—"}</span></td>
+      <td>${inativo?'<span class="badge badge-atr">Sem indicações</span>':'<span class="badge badge-pago">Com indicações</span>'}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function carregarAdmin(){
+  try{
+    const r=await api({action:"admin",senha:ADMIN_PASS});
+    if(!r.ok){document.getElementById("adm-loading").textContent=r.erro||"Erro ao carregar.";return;}
+
+    document.getElementById("adm-loading").style.display="none";
+    document.getElementById("adm-content").style.display="block";
+
+    const parc=r.parceiros||[];
+    let totPago=0,totPrev=0,totAtr=0;
+    parc.forEach(p=>{totPago+=p.pago||0;totPrev+=p.previsto||0;totAtr+=p.atraso||0;});
+    const totVol=totPago+totPrev+totAtr;
+
+    ADM_DADOS.parc=parc;
+    ADM_DADOS.nomes=parc.map(p=>p.nome.split(" ")[0]);
+    ADM_DADOS.pagoV=parc.map(p=>p.pago||0);
+    ADM_DADOS.prevV=parc.map(p=>p.previsto||0);
+    ADM_DADOS.atrV=parc.map(p=>p.atraso||0);
+    ADM_DADOS.totV=parc.map((_,i)=>ADM_DADOS.pagoV[i]+ADM_DADOS.prevV[i]+ADM_DADOS.atrV[i]);
+    /* honorariosRecebidos vem do GAS: soma coluna C (Valor Honorário) das linhas PAGO */
+    ADM_DADOS.honRecV=parc.map(p=>p.honorariosRecebidos||0);
+    ADM_DADOS.comDevidaV=parc.map((_,i)=>ADM_DADOS.totV[i]);
+
+    /* ── TOP CARDS ── */
+    document.getElementById("adm-top-cards").innerHTML=
+      `<div class="adm-tc adm-tc-n"><div class="adm-tc-label">Parceiros</div><div class="adm-tc-val">${parc.length}</div><div class="adm-tc-sub">cadastrados</div></div>`+
+      `<div class="adm-tc adm-tc-pago"><div class="adm-tc-label">Total pago</div><div class="adm-tc-val">${fmtK(totPago)}</div><div class="adm-tc-sub">liquidado</div></div>`+
+      `<div class="adm-tc adm-tc-prev"><div class="adm-tc-label">Previsto</div><div class="adm-tc-val">${fmtK(totPrev)}</div><div class="adm-tc-sub">a pagar</div></div>`+
+      `<div class="adm-tc adm-tc-atr"><div class="adm-tc-label">Em atraso</div><div class="adm-tc-val">${fmtK(totAtr)}</div><div class="adm-tc-sub">pendente</div></div>`+
+      `<div class="adm-tc adm-tc-vol"><div class="adm-tc-label">Volume total</div><div class="adm-tc-val">${fmtK(totVol)}</div><div class="adm-tc-sub">acumulado</div></div>`;
+
+    /* ── POPULAR SELECTS DE FILTRO ── */
+    ["adm-filtro-parceiro","adm-rel-filtro"].forEach(selId=>{
+      const sel=document.getElementById(selId);if(!sel)return;
+      const base=selId==="adm-filtro-parceiro"?'<option value="TODOS">Todos os parceiros</option>':'<option value="TODOS">Todos</option>';
+      sel.innerHTML=base+parc.map(p=>`<option value="${p.usuario}">${p.nome}</option>`).join("");
+    });
+    /* Popular ano no filtro admin */
+    const selAnoAdm=document.getElementById("adm-filtro-ano");
+    if(selAnoAdm&&selAnoAdm.options.length<=1){
+      const anoAtualAdm=new Date().getFullYear();
+      [anoAtualAdm-1,anoAtualAdm,anoAtualAdm+1].forEach(a=>{const o=document.createElement("option");o.value=String(a);o.textContent=String(a);selAnoAdm.appendChild(o);});
+    }
+
+    /* ── RENDER DASHOARD ── */
+    admRenderDashboard();
+
+    /* ── CARDS DE PARCEIROS ── */
+    document.getElementById("adm-parceiros-grid").innerHTML=parc.map((p,i)=>{
+      const tot=ADM_DADOS.totV[i];const prog=tot>0?Math.round((ADM_DADOS.pagoV[i]/tot)*100):0;
+      return`<div class="adm-pc-card" data-nome="${p.nome.toLowerCase()}">
+        <div class="adm-pc-head">
+          <div class="adm-avatar">${admIni(p.nome)}</div>
+          <div><div class="adm-pc-name">${p.nome}</div><div class="adm-pc-email">${p.usuario}</div></div>
+        </div>
+        <div class="adm-pc-stats">
+          <div class="adm-ps adm-ps-verde"><div class="adm-ps-label">Pago</div><div class="adm-ps-val">${fmtK(p.pago||0)}</div></div>
+          <div class="adm-ps adm-ps-azul"><div class="adm-ps-label">Previsto</div><div class="adm-ps-val">${fmtK(p.previsto||0)}</div></div>
+          <div class="adm-ps adm-ps-atr"><div class="adm-ps-label">Atraso</div><div class="adm-ps-val">${fmtK(p.atraso||0)}</div></div>
+        </div>
+        <div class="adm-prog-bg"><div class="adm-prog-fill" style="width:${prog}%"></div></div>
+        <div class="adm-prog-label">${prog}% liquidado · volume total ${fmtK(tot)}</div>
+        <div class="adm-rentab ${tot>0?"adm-rentab-pos":"adm-rentab-neg"}">${tot>0?`Pago: <strong>${fmt(p.pago||0)}</strong> · Previsto: <strong>${fmtK(p.previsto||0)}</strong>`:"Sem indicações registradas"}</div>
+        <button class="adm-wpp-btn" onclick="enviarWpp('${p.wpp}','${p.nome}',${p.previsto||0})">${WPP_SVG} Enviar WhatsApp</button>
+      </div>`;
+    }).join("");
+
+    /* ── RELATÓRIO ── */
+    admRenderRelatorio("TODOS");
+
+    /* ── COMPARATIVO ── */
+    admRenderComparativo();
+
+    /* ── ALERTAS ── */
+    const alertas=[];
+    const inativos=parc.filter((_,i)=>ADM_DADOS.totV[i]===0);
+    if(inativos.length)alertas.push({t:"warn",m:`<strong>${inativos.length} parceiro(s) sem indicações:</strong> ${inativos.map(p=>p.nome).join(", ")}.`});
+    if(totAtr>0)alertas.push({t:"danger",m:`<strong>${fmt(totAtr)} em atraso</strong> no total.`});
+    parc.forEach(p=>{if((p.atraso||0)>0)alertas.push({t:"danger",m:`<strong>${p.nome}</strong> tem ${fmtK(p.atraso)} em atraso.`});});
+    parc.forEach(p=>{if((p.previsto||0)>0)alertas.push({t:"warn",m:`<strong>${p.nome}</strong> tem ${fmtK(p.previsto)} de comissão prevista aguardando liquidação.`});});
+    if(!alertas.length)alertas.push({t:"ok",m:"Nenhum alerta no momento. Todos os parceiros estão em dia."});
+    const aC={danger:"#a93226",warn:"#b7950b",ok:"#1a8a4a"};
+    const aB={danger:"#fff5f5",warn:"#fef9e7",ok:"#f0fff4"};
+    const aBd={danger:"#e74c3c",warn:"#BA7517",ok:"#2ecc71"};
+    document.getElementById("adm-alertas-list").innerHTML=alertas.map(a=>
+      `<div class="adm-alerta" style="border-color:${aBd[a.t]};background:${aB[a.t]};color:${aC[a.t]}">${a.m}</div>`
+    ).join("");
+
+  } catch(e){document.getElementById("adm-loading").textContent="Erro ao carregar: "+e.message;}
+}
+
+/* ===== GERAÇÃO DE PDF — RELATÓRIO DO PARCEIRO ===== */
+function gerarPdfRelatorioParceiro(filtrado){
+  if(!PAR_DADOS.totais){alert("Dados ainda não carregados. Aguarde um instante.");return;}
+  const {totais,indicacoes,clientes,ativos,cancelados}=PAR_DADOS;
+  const dataHoje=new Date().toLocaleDateString("pt-BR");
+  const mesRef=new Date().toLocaleString("pt-BR",{month:"long",year:"numeric"});
+  const totalGeral=(totais.pago||0)+(totais.previsto||0)+(totais.atraso||0);
+  const pctLiquid=totalGeral>0?((totais.pago||0)/totalGeral*100).toFixed(1):"0";
+
+  /* Aplica filtros se solicitado */
+  let indFiltradas=indicacoes||[];
+  let filtroDesc="Todos os dados";
+  if(filtrado){
+    indFiltradas=indFiltradas.filter(i=>{
+      const stOk=filtroAtual==="TODOS"||i.status===filtroAtual;
+      const dtOk=parPagamentoMatch(i.pagamento);
+      const cliOk=!PAR_FILTRO.cliente||(i.id||"").toLowerCase().includes(PAR_FILTRO.cliente);
+      return stOk&&dtOk&&cliOk;
+    });
+    const partes=[];
+    if(filtroAtual!=="TODOS") partes.push(`Status: ${filtroAtual}`);
+    if(PAR_FILTRO.mes&&PAR_FILTRO.ano) partes.push(`${PAR_FILTRO.mes}/${PAR_FILTRO.ano}`);
+    else if(PAR_FILTRO.atalho==="3m") partes.push("Últimos 3 meses");
+    if(PAR_FILTRO.cliente) partes.push(`Cliente: "${PAR_FILTRO.cliente}"`);
+    filtroDesc=partes.length?partes.join(" · "):"Todos os dados";
+  }
+
+  /* Captura gráficos como imagem (se existirem) */
+  const imgCom=PAR_CHARTS.comissoes?PAR_CHARTS.comissoes.toBase64Image("image/png",1):"";
+  const imgCli=PAR_CHARTS.clientes?PAR_CHARTS.clientes.toBase64Image("image/png",1):"";
+
+  const lM={PAGO:"Pago",PREVISTO:"Previsto","EM ATRASO":"Em Atraso",SEM_ACEITE:"Sem Aceite"};
+  const corStatus={PAGO:"#1a8a4a",PREVISTO:"#1a6aa5","EM ATRASO":"#a93226",SEM_ACEITE:"#d68910"};
+
+  const linhasInd=(indFiltradas||[]).map(i=>`<tr>
+    <td>${i.id||"—"}</td>
+    <td>${i.competencia||"—"}</td>
+    <td>${i.tipo||"—"}</td>
+    <td>${i.parcela||"—"}</td>
+    <td>${i.pagamento||"—"}</td>
+    <td style="text-align:right;font-weight:600">${fmt(i.valor)}</td>
+    <td><span style="color:${corStatus[i.status]||"#555"};font-weight:700">${lM[i.status]||i.status||"—"}</span></td>
+  </tr>`).join("");
+
+  const linhasCli=(clientes||[]).map(c=>{
+    const sit=(c.situacao||"").toLowerCase();
+    const cor=sit==="ativo"?"#1a8a4a":["cancelado","perdido"].includes(sit)?"#a93226":"#1a6aa5";
+    return `<tr>
+      <td>${c.data||"—"}</td>
+      <td style="font-weight:600">${c.cliente||"—"}</td>
+      <td>${c.tipoServico||"—"}</td>
+      <td>${c.honorarios>0?fmt(c.honorarios):"—"}</td>
+      <td>${c.comissao>0?fmt(c.comissao):"—"}</td>
+      <td><span style="color:${cor};font-weight:700">${c.situacao||"—"}</span></td>
+    </tr>`;
+  }).join("");
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Relatório do Parceiro — ${NOME}</title><style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,Helvetica,sans-serif;max-width:820px;margin:0 auto;padding:26px;color:#222;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:6px}
+    .logo-wrap{background:#0D2026;border-radius:10px;padding:10px;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
+    .logo{width:70px;height:70px;object-fit:contain}
+    .titulo{font-size:.95rem;font-weight:700;color:#0D2026;text-align:right;line-height:1.4}
+    .titulo small{font-weight:400;color:#666;font-size:.75rem}
+    .linha{height:3px;background:linear-gradient(90deg,#FED26C,#0D2026);margin-bottom:18px}
+    .bloco{background:#f8f9fa;border-radius:6px;padding:12px 14px;margin-bottom:14px;font-size:.85rem;line-height:1.9}
+    .bloco strong{color:#0D2026}
+    h2{font-size:.95rem;color:#0D2026;margin:18px 0 10px;padding-bottom:5px;border-bottom:2px solid #FED26C}
+    .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+    .card{background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;border-left:3px solid;text-align:left}
+    .card .lbl{font-size:.6rem;color:#888;text-transform:uppercase;font-weight:700;letter-spacing:.3px}
+    .card .vlr{font-size:.92rem;font-weight:800;margin-top:4px}
+    .c-pago{border-left-color:#2ecc71}.c-pago .vlr{color:#1a8a4a}
+    .c-prev{border-left-color:#3498db}.c-prev .vlr{color:#1a6aa5}
+    .c-atr{border-left-color:#e74c3c}.c-atr .vlr{color:#a93226}
+    .c-ativos{border-left-color:#7F77DD}.c-ativos .vlr{color:#3C3489}
+    .c-cancel{border-left-color:#888}.c-cancel .vlr{color:#555}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+    .chart-box{background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;text-align:center}
+    .chart-box h4{font-size:.72rem;color:#666;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+    .chart-box img{max-width:100%;height:auto;max-height:230px}
+    table{width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:10px}
+    th{background:#0D2026;color:#FED26C;padding:8px 9px;text-align:left;font-size:.72rem;text-transform:uppercase;font-weight:700}
+    td{padding:7px 9px;border-bottom:1px solid #eee}
+    tr:nth-child(even) td{background:#fafafa}
+    .resumo-fim{margin-top:18px;padding:12px 14px;background:#0D2026;color:#fff;border-radius:8px;font-size:.85rem;display:flex;justify-content:space-between;align-items:center}
+    .resumo-fim strong{color:#FED26C;font-size:1.05rem}
+    .footer{margin-top:24px;border-top:1px solid #eee;padding-top:10px;font-size:.7rem;color:#888;text-align:center;line-height:1.8}
+    .empty-row{text-align:center;padding:18px;color:#888;font-style:italic}
+    @media print{
+      body{padding:18px;max-width:none}
+      .no-print{display:none}
+      h2{page-break-after:avoid}
+      table{page-break-inside:auto}
+      tr{page-break-inside:avoid}
+    }
+    .btn-print{position:fixed;top:18px;right:18px;padding:10px 18px;background:#0D2026;color:#FED26C;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+  </style></head><body>
+    <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    <div class="header">
+      <div class="logo-wrap"><img class="logo" src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática"/></div>
+      <div class="titulo">RELATÓRIO DO PARCEIRO<br><small>Central de Parceiros · Tática Gestão Contábil</small></div>
+    </div>
+    <div class="linha"></div>
+
+    <div class="bloco">
+      <strong>Parceiro:</strong> ${NOME||"—"}<br>
+      <strong>Referência:</strong> ${mesRef}<br>
+      <strong>Filtro aplicado:</strong> ${filtroDesc}<br>
+      <strong>Emitido em:</strong> ${dataHoje}
+    </div>
+
+    <h2>Resumo Financeiro</h2>
+    <div class="cards">
+      <div class="card c-pago"><div class="lbl">Pago</div><div class="vlr">${fmt(totais.pago)}</div></div>
+      <div class="card c-prev"><div class="lbl">Previsto</div><div class="vlr">${fmt(totais.previsto)}</div></div>
+      <div class="card c-atr"><div class="lbl">Em Atraso</div><div class="vlr">${fmt(totais.atraso)}</div></div>
+      <div class="card c-ativos"><div class="lbl">Clientes Ativos</div><div class="vlr">${ativos.length}</div></div>
+      <div class="card c-cancel"><div class="lbl">Cancelados</div><div class="vlr">${cancelados.length}</div></div>
+    </div>
+
+    ${imgCom||imgCli?`<div class="charts">
+      ${imgCom?`<div class="chart-box"><h4>Distribuição de Comissões</h4><img src="${imgCom}" alt="Distribuição de Comissões"/></div>`:""}
+      ${imgCli?`<div class="chart-box"><h4>Situação dos Clientes</h4><img src="${imgCli}" alt="Situação dos Clientes"/></div>`:""}
+    </div>`:""}
+
+    <h2>Indicações &amp; Comissões</h2>
+    <table>
+      <thead><tr><th>Cliente</th><th>Competência</th><th>Tipo</th><th>Parcela</th><th>Previsão</th><th style="text-align:right">Comissão</th><th>Status</th></tr></thead>
+      <tbody>${linhasInd||`<tr><td colspan="7" class="empty-row">Nenhuma indicação registrada.</td></tr>`}</tbody>
+    </table>
+
+    <h2>Meus Clientes</h2>
+    <table>
+      <thead><tr><th>Data</th><th>Cliente</th><th>Tipo de Serviço</th><th>Honorários</th><th>Comissão</th><th>Situação</th></tr></thead>
+      <tbody>${linhasCli||`<tr><td colspan="6" class="empty-row">Nenhum cliente registrado.</td></tr>`}</tbody>
+    </table>
+
+    <div class="resumo-fim">
+      <span>Volume total movimentado · <strong>${pctLiquid}%</strong> liquidado</span>
+      <strong>${fmt(totalGeral)}</strong>
+    </div>
+
+    <div class="footer">
+      📧 financeiro@taticacontabilidade.com &nbsp;|&nbsp; 📍 Rua Machado Lemos, 226 – Maceió/AL &nbsp;|&nbsp; 📞 (82) 3024-3993<br>
+      Documento gerado automaticamente em ${dataHoje} pelo Portal Central de Parceiros.
+    </div>
+    <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+  </body></html>`;
+
+  const w=window.open("","_blank");
+  if(!w){alert("⚠️ O navegador bloqueou a abertura da janela. Permita pop-ups para baixar o PDF.");return;}
+  w.document.write(html);w.document.close();
+}
+
+/* ===== GERAÇÃO DE PDF — RELATÓRIO CONSOLIDADO ADMIN ===== */
+function gerarPdfRelatorioAdmin(filtrado){
+  if(!ADM_DADOS.parc||!ADM_DADOS.parc.length){alert("Dados ainda não carregados. Aguarde um instante.");return;}
+  const {parc,pagoV,prevV,atrV,totV}=ADM_DADOS;
+  const dataHoje=new Date().toLocaleDateString("pt-BR");
+  const mesRef=new Date().toLocaleString("pt-BR",{month:"long",year:"numeric"});
+
+  /* Filtra parceiros se necessário */
+  let idxParc=parc.map((_,i)=>i);
+  let filtroDescAdm="Todos os dados";
+  if(filtrado&&ADM_FILTRO_PARC!=="TODOS"){
+    idxParc=idxParc.filter(i=>parc[i].usuario===ADM_FILTRO_PARC);
+    filtroDescAdm=`Parceiro: ${parc.find(p=>p.usuario===ADM_FILTRO_PARC)?.nome||ADM_FILTRO_PARC}`;
+    const fm=document.getElementById("adm-filtro-mes")?.value;
+    const fa=document.getElementById("adm-filtro-ano")?.value;
+    if(fm||fa) filtroDescAdm+=` · ${fm||""}/${fa||""}`;
+  }
+
+  let totPago=0,totPrev=0,totAtr=0;
+  idxParc.forEach(i=>{totPago+=parc[i].pago||0;totPrev+=parc[i].previsto||0;totAtr+=parc[i].atraso||0;});
+  const totVol=totPago+totPrev+totAtr;
+  const pctLiquid=totVol>0?(totPago/totVol*100).toFixed(1):"0";
+  const inativos=idxParc.map(i=>totV[i]===0).filter(Boolean).length>0?parc.filter((_,i)=>idxParc.includes(i)&&totV[i]===0):[];
+
+  /* Captura gráficos do admin como imagem */
+  const imgBarras=ADM_CHARTS["adm-chart-barras"]?ADM_CHARTS["adm-chart-barras"].toBase64Image("image/png",1):"";
+  const imgPizza=ADM_CHARTS["adm-chart-pizza"]?ADM_CHARTS["adm-chart-pizza"].toBase64Image("image/png",1):"";
+  const imgStatus=ADM_CHARTS["adm-chart-status"]?ADM_CHARTS["adm-chart-status"].toBase64Image("image/png",1):"";
+
+  const linhasParc=idxParc.map((i)=>{
+    const p=parc[i];const tot=totV[i];const prog=tot>0?Math.round((pagoV[i]/tot)*100):0;
+    const inativo=tot===0;
+    return `<tr style="${inativo?'background:#fff5f5':''}">
+      <td style="font-weight:600">${p.nome}<br><small style="color:#888;font-weight:400">${p.usuario||"—"}</small></td>
+      <td style="color:#1a8a4a;font-weight:600">${fmt(pagoV[i])}</td>
+      <td style="color:#1a6aa5;font-weight:600">${fmt(prevV[i])}</td>
+      <td style="color:${atrV[i]>0?'#a93226':'#888'};font-weight:600">${fmt(atrV[i])}</td>
+      <td style="font-weight:600">${fmt(tot)}</td>
+      <td>${prog}%</td>
+      <td><span style="color:${inativo?'#a93226':'#1a8a4a'};font-weight:700">${inativo?"Inativo":"Ativo"}</span></td>
+    </tr>`;
+  }).join("");
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>Relatório Consolidado — Administração</title><style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,Helvetica,sans-serif;max-width:880px;margin:0 auto;padding:26px;color:#222;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .header{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:6px}
+    .logo-wrap{background:#0D2026;border-radius:10px;padding:10px;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
+    .logo{width:70px;height:70px;object-fit:contain}
+    .titulo{font-size:.95rem;font-weight:700;color:#0D2026;text-align:right;line-height:1.4}
+    .titulo small{font-weight:400;color:#666;font-size:.75rem}
+    .linha{height:3px;background:linear-gradient(90deg,#FED26C,#0D2026);margin-bottom:18px}
+    .bloco{background:#f8f9fa;border-radius:6px;padding:12px 14px;margin-bottom:14px;font-size:.85rem;line-height:1.9}
+    .bloco strong{color:#0D2026}
+    h2{font-size:.95rem;color:#0D2026;margin:18px 0 10px;padding-bottom:5px;border-bottom:2px solid #FED26C}
+    .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+    .card{background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;border-left:3px solid;text-align:left}
+    .card .lbl{font-size:.6rem;color:#888;text-transform:uppercase;font-weight:700;letter-spacing:.3px}
+    .card .vlr{font-size:.95rem;font-weight:800;margin-top:4px}
+    .c-pago{border-left-color:#2ecc71}.c-pago .vlr{color:#1a8a4a}
+    .c-prev{border-left-color:#3498db}.c-prev .vlr{color:#1a6aa5}
+    .c-atr{border-left-color:#e74c3c}.c-atr .vlr{color:#a93226}
+    .c-parc{border-left-color:#0D2026}.c-parc .vlr{color:#0D2026}
+    .c-vol{border-left-color:#7F77DD}.c-vol .vlr{color:#3C3489}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+    .chart-box{background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;text-align:center}
+    .chart-box.full{grid-column:1 / span 2}
+    .chart-box h4{font-size:.72rem;color:#666;text-transform:uppercase;margin-bottom:8px;font-weight:700}
+    .chart-box img{max-width:100%;height:auto;max-height:240px}
+    table{width:100%;border-collapse:collapse;font-size:.76rem;margin-bottom:10px}
+    th{background:#0D2026;color:#FED26C;padding:8px 9px;text-align:left;font-size:.7rem;text-transform:uppercase;font-weight:700}
+    td{padding:7px 9px;border-bottom:1px solid #eee;vertical-align:top}
+    tr:nth-child(even) td{background:#fafafa}
+    .resumo-fim{margin-top:18px;padding:12px 14px;background:#0D2026;color:#fff;border-radius:8px;font-size:.85rem;display:flex;justify-content:space-between;align-items:center}
+    .resumo-fim strong{color:#FED26C;font-size:1.05rem}
+    .alerta-box{margin-top:14px;padding:11px 14px;border-left:3px solid #b7950b;background:#fef9e7;border-radius:0 8px 8px 0;font-size:.82rem;color:#7d5f00}
+    .footer{margin-top:24px;border-top:1px solid #eee;padding-top:10px;font-size:.7rem;color:#888;text-align:center;line-height:1.8}
+    @media print{
+      body{padding:18px;max-width:none}
+      .no-print{display:none}
+      h2{page-break-after:avoid}
+      tr{page-break-inside:avoid}
+      .charts{page-break-inside:avoid}
+    }
+    .btn-print{position:fixed;top:18px;right:18px;padding:10px 18px;background:#0D2026;color:#FED26C;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+  </style></head><body>
+    <button class="btn-print no-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    <div class="header">
+      <div class="logo-wrap"><img class="logo" src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo Tática"/></div>
+      <div class="titulo">RELATÓRIO CONSOLIDADO<br><small>Central de Parceiros · Administração</small></div>
+    </div>
+    <div class="linha"></div>
+
+    <div class="bloco">
+      <strong>Período de referência:</strong> ${mesRef}<br>
+      <strong>Filtro aplicado:</strong> ${filtroDescAdm}<br>
+      <strong>Emitido em:</strong> ${dataHoje}<br>
+      <strong>Total de parceiros no relatório:</strong> ${idxParc.length}
+    </div>
+
+    <h2>Resumo Geral</h2>
+    <div class="cards">
+      <div class="card c-parc"><div class="lbl">Parceiros</div><div class="vlr">${idxParc.length}</div></div>
+      <div class="card c-pago"><div class="lbl">Total Pago</div><div class="vlr">${fmt(totPago)}</div></div>
+      <div class="card c-prev"><div class="lbl">Previsto</div><div class="vlr">${fmt(totPrev)}</div></div>
+      <div class="card c-atr"><div class="lbl">Em Atraso</div><div class="vlr">${fmt(totAtr)}</div></div>
+      <div class="card c-vol"><div class="lbl">Vol. Total</div><div class="vlr">${fmt(totVol)}</div></div>
+    </div>
+
+    ${imgBarras||imgPizza||imgStatus?`<h2>Análise Visual</h2>
+    <div class="charts">
+      ${imgBarras?`<div class="chart-box"><h4>Comissões por parceiro</h4><img src="${imgBarras}" alt="Comissões por parceiro"/></div>`:""}
+      ${imgPizza?`<div class="chart-box"><h4>Participação no volume total</h4><img src="${imgPizza}" alt="Participação no volume total"/></div>`:""}
+      ${imgStatus?`<div class="chart-box full"><h4>Status consolidado por parceiro</h4><img src="${imgStatus}" alt="Status consolidado"/></div>`:""}
+    </div>`:""}
+
+    <h2>Detalhamento por Parceiro</h2>
+    <table>
+      <thead><tr><th>Parceiro</th><th>Pago</th><th>Previsto</th><th>Em Atraso</th><th>Vol. Total</th><th>% Liquid.</th><th>Status</th></tr></thead>
+      <tbody>${linhasParc}</tbody>
+    </table>
+
+    ${inativos.length?`<div class="alerta-box"><strong>⚠️ ${inativos.length} parceiro(s) sem indicações:</strong> ${inativos.map(p=>p.nome).join(", ")}</div>`:""}
+
+    <div class="resumo-fim">
+      <span>Volume total movimentado · <strong>${pctLiquid}%</strong> liquidado</span>
+      <strong>${fmt(totVol)}</strong>
+    </div>
+
+    <div class="footer">
+      📧 financeiro@taticacontabilidade.com &nbsp;|&nbsp; 📍 Rua Machado Lemos, 226 – Maceió/AL &nbsp;|&nbsp; 📞 (82) 3024-3993<br>
+      Documento gerado automaticamente em ${dataHoje} pelo Portal Central de Parceiros.
+    </div>
+    <script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script>
+  </body></html>`;
+
+  const w=window.open("","_blank");
+  if(!w){alert("⚠️ O navegador bloqueou a abertura da janela. Permita pop-ups para baixar o PDF.");return;}
+  w.document.write(html);w.document.close();
+}
+
+function enviarWpp(wpp,nome,prev){
+  const mes=new Date().toLocaleString("pt-BR",{month:"long",year:"numeric"});
+  const msg=`Olá, ${nome}! 👋\n\nA *Tática Gestão Contábil* informa que seu recibo de comissão referente a *${mes}* já está disponível para assinatura.\n\n💰 *Valor: ${fmtK(prev)}*\n\n✍️ Acesse o link para assinar:\nhttps://centralparceiros.github.io/Central-de-Parceiros-/\n\n📞 (82) 3024-3993`;
+  window.open(`https://wa.me/${wpp}?text=${encodeURIComponent(msg)}`,"_blank");
+}
+
+document.getElementById("inp-pass").addEventListener("keydown",e=>e.key==="Enter"&&doLogin());
+document.getElementById("modal-pdf").addEventListener("click",function(e){if(e.target===this)fecharModalPdf();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")fecharModalPdf();});
+</script>
+
+<!-- APP COMERCIAL -->
+<div id="app-comercial" style="display:none;min-height:100vh">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><img src="https://i.postimg.cc/ydsjTmxD/Logo-Ta-tica-02.png" alt="Logo"/><div><h3>Comercial</h3><p>Tática Gestão Contábil</p></div></div>
+      <nav class="sidebar-nav">
+        <button class="snav active" onclick="comGoTo('kanban',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="15" rx="1"/></svg>Kanban</button>
+        <button class="snav" onclick="comGoTo('leads',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Todos os Leads</button>
+      </nav>
+      <div class="sidebar-footer"><div class="uname" id="com-nome-display">Comercial</div><button class="btn-logout" onclick="doLogout()">Sair da conta</button></div>
+    </aside>
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-title" id="com-page-title">Kanban de Leads</div>
+        <div class="topbar-user"><div><div class="user-name" id="com-nome-avatar"></div><div class="user-role">Equipe Comercial</div></div><div class="user-avatar" id="com-user-avatar">C</div></div>
+      </div>
+      <div class="page-content">
+        <div id="com-screen-kanban">
+          <div style="margin-bottom:18px;display:flex;gap:12px;flex-wrap:wrap">
+            <input id="com-busca" type="text" placeholder="Buscar lead..." oninput="renderKanban(this.value.toLowerCase())" style="padding:8px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.84rem;min-width:200px">
+            <button onclick="comCarregar()" style="padding:8px 16px;background:var(--azul);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.82rem">↻ Atualizar</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">
+            <div style="background:#f0f2f5;border-radius:14px;padding:14px"><div style="font-size:.78rem;font-weight:800;text-transform:uppercase;color:#3498db;margin-bottom:10px;display:flex;justify-content:space-between">🆕 Novo<span id="badge-Novo" style="background:#3498db22;color:#3498db;border-radius:20px;padding:1px 8px">0</span></div><div id="cards-Novo"></div></div>
+            <div style="background:#f0f2f5;border-radius:14px;padding:14px"><div style="font-size:.78rem;font-weight:800;text-transform:uppercase;color:#e67e22;margin-bottom:10px;display:flex;justify-content:space-between">📞 Em Contato<span id="badge-Em contato" style="background:#e67e2222;color:#e67e22;border-radius:20px;padding:1px 8px">0</span></div><div id="cards-Em contato"></div></div>
+            <div style="background:#f0f2f5;border-radius:14px;padding:14px"><div style="font-size:.78rem;font-weight:800;text-transform:uppercase;color:#9b59b6;margin-bottom:10px;display:flex;justify-content:space-between">📋 Proposta<span id="badge-Proposta" style="background:#9b59b622;color:#9b59b6;border-radius:20px;padding:1px 8px">0</span></div><div id="cards-Proposta"></div></div>
+            <div style="background:#f0f2f5;border-radius:14px;padding:14px"><div style="font-size:.78rem;font-weight:800;text-transform:uppercase;color:#2ecc71;margin-bottom:10px;display:flex;justify-content:space-between">✅ Fechado<span id="badge-Fechado" style="background:#2ecc7122;color:#2ecc71;border-radius:20px;padding:1px 8px">0</span></div><div id="cards-Fechado"></div></div>
+          </div>
+          <div style="margin-top:14px;background:#f0f2f5;border-radius:14px;padding:14px"><div style="font-size:.78rem;font-weight:800;text-transform:uppercase;color:#e74c3c;margin-bottom:10px;display:flex;justify-content:space-between">❌ Perdido<span id="badge-Perdido" style="background:#e74c3c22;color:#e74c3c;border-radius:20px;padding:1px 8px">0</span></div><div id="cards-Perdido" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px"></div></div>
+        </div>
+        <div id="com-screen-leads" style="display:none">
+          <table style="width:100%;border-collapse:collapse;font-size:.84rem">
+            <thead><tr style="background:var(--azul)"><th style="padding:10px 12px;color:var(--dourado);text-align:left">Data</th><th style="padding:10px 12px;color:var(--dourado);text-align:left">Lead</th><th style="padding:10px 12px;color:var(--dourado);text-align:left">Parceiro</th><th style="padding:10px 12px;color:var(--dourado);text-align:left">Etapa</th><th style="padding:10px 12px;color:var(--dourado);text-align:left">Ação</th></tr></thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LEAD -->
+<div id="modal-lead" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:500px;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div style="font-size:1rem;font-weight:800;color:var(--azul);margin-bottom:14px" id="modal-lead-titulo">Lead</div>
+    <div id="modal-lead-info" style="font-size:.84rem;color:#555;line-height:1.8;margin-bottom:14px"></div>
+    <div style="margin-bottom:12px"><label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px">Etapa</label><select id="modal-lead-etapa" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.85rem"><option value="Novo">🆕 Novo</option><option value="Em contato">📞 Em Contato</option><option value="Proposta">📋 Proposta</option><option value="Fechado">✅ Fechado</option><option value="Perdido">❌ Perdido</option></select></div>
+    <div style="margin-bottom:12px"><label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px">Observação</label><input id="modal-lead-obs" type="text" placeholder="Ex: Cliente pediu orçamento..." style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.85rem;box-sizing:border-box"></div>
+    <div style="margin-bottom:14px"><div style="font-size:.76rem;font-weight:700;color:#888;margin-bottom:6px">HISTÓRICO</div><div id="modal-lead-hist" style="max-height:130px;overflow-y:auto;font-size:.8rem"></div></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="document.getElementById('modal-lead').style.display='none'" style="padding:9px 20px;border:1.5px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:.84rem">Cancelar</button>
+      <button onclick="salvarEtapa()" style="padding:9px 20px;background:var(--azul);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:700">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO USUÁRIO -->
+<div id="modal-novo-user" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div style="font-size:1rem;font-weight:800;color:var(--azul);margin-bottom:20px">➕ Novo Usuário</div>
+    <div style="margin-bottom:14px"><label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px">Nome completo</label><input id="nu-nome" type="text" placeholder="Ex: João Silva" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.85rem;box-sizing:border-box"></div>
+    <div style="margin-bottom:14px"><label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px">E-mail</label><input id="nu-email" type="email" placeholder="joao@empresa.com" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.85rem;box-sizing:border-box"></div>
+    <div style="margin-bottom:14px"><label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px">Senha</label><input id="nu-senha" type="text" placeholder="Mínimo 6 caracteres" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.85rem;box-sizing:border-box"></div>
+    <div style="margin-bottom:14px"><label style="font-size:.78rem;font-weight:600;color:#555;display:block;margin-bottom:5px">Perfil</label><select id="nu-perfil" style="width:100%;padding:9px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.85rem"><option value="comercial">💼 Comercial</option><option value="admin">👑 Administrador</option></select></div>
+    <div id="nu-erro" style="color:#e74c3c;font-size:.8rem;display:none;margin-bottom:10px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="document.getElementById('modal-novo-user').style.display='none'" style="padding:9px 20px;border:1.5px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:.84rem">Cancelar</button>
+      <button onclick="salvarNovoUsuario()" style="padding:9px 20px;background:var(--azul);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:700">Criar Usuário</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function comGoTo(id,el){document.querySelectorAll("#app-comercial .snav").forEach(b=>b.classList.remove("active"));if(el)el.classList.add("active");document.getElementById("com-screen-kanban").style.display=id==="kanban"?"block":"none";document.getElementById("com-screen-leads").style.display=id==="leads"?"block":"none";document.getElementById("com-page-title").textContent=id==="kanban"?"Kanban de Leads":"Todos os Leads";if(id==="leads")renderLeadsTabela();}
+async function comCarregar(){try{const r=await api({action:"listarLeads",senha:ADMIN_PASS});_leadsData=r.ok?r.leads||[]:[]}catch(e){_leadsData=[];}renderKanban();}
+function renderKanban(q=""){const etapas=["Novo","Em contato","Proposta","Fechado","Perdido"],cores={Novo:"#3498db","Em contato":"#e67e22",Proposta:"#9b59b6",Fechado:"#2ecc71",Perdido:"#e74c3c"};etapas.forEach(e=>{const el=document.getElementById("cards-"+e);if(el)el.innerHTML="";const b=document.getElementById("badge-"+e);if(b)b.textContent="0";});const hist=getLeadsHist(),counts={};etapas.forEach(e=>counts[e]=0);_leadsData.forEach(lead=>{const etapa=getLeadEtapa(lead.id)||"Novo";if(q&&!(lead.cliente||"").toLowerCase().includes(q)&&!(lead.parceiro||"").toLowerCase().includes(q))return;counts[etapa]=(counts[etapa]||0)+1;const container=document.getElementById("cards-"+etapa);if(!container)return;const leadHist=hist[lead.id]||[],ultima=leadHist.length?leadHist[leadHist.length-1]:null;const card=document.createElement("div");card.style.cssText="background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid "+(cores[etapa]||"#ccc")+";cursor:pointer";card.innerHTML="<div style='font-size:.88rem;font-weight:700;color:#1a1a2e;margin-bottom:3px'>"+(lead.cliente||"—")+"</div><div style='font-size:.75rem;color:#888'>👤 "+(lead.parceiro||"—")+"</div>"+(lead.telefone?"<div style='font-size:.73rem;color:#aaa'>📞 "+lead.telefone+"</div>":"")+(ultima?"<div style='font-size:.72rem;color:#aaa;font-style:italic;margin-top:4px'>""+( ultima.obs||ultima.etapa||"")+""</div>":"");card.onclick=()=>abrirModalLead(lead);container.appendChild(card);});etapas.forEach(e=>{const b=document.getElementById("badge-"+e);if(b)b.textContent=counts[e]||0;});}
+function abrirModalLead(lead){_leadAtual=lead;document.getElementById("modal-lead-titulo").textContent=lead.cliente||"Lead";document.getElementById("modal-lead-info").innerHTML="<b>Parceiro:</b> "+(lead.parceiro||"—")+"<br><b>Tel:</b> "+(lead.telefone||"—")+"<br><b>E-mail:</b> "+(lead.email||"—")+"<br><b>Tipo:</b> "+(lead.tipoServico||"—")+"<br><b>Msg:</b> "+(lead.mensagem||"—");document.getElementById("modal-lead-etapa").value=getLeadEtapa(lead.id)||"Novo";document.getElementById("modal-lead-obs").value="";const hist=getLeadsHist(),items=hist[lead.id]||[];document.getElementById("modal-lead-hist").innerHTML=items.length?items.slice().reverse().map(h=>"<div style='padding:6px 0;border-bottom:1px solid #f0f0f0'><span style='font-weight:600'>"+h.etapa+"</span>"+(h.obs?" — "+h.obs:"")+"<div style='font-size:.7rem;color:#bbb'>"+h.data+"</div></div>").join(""):"<div style='color:#bbb;font-size:.78rem'>Sem histórico ainda.</div>";document.getElementById("modal-lead").style.display="flex";}
+function salvarEtapa(){if(!_leadAtual)return;const etapa=document.getElementById("modal-lead-etapa").value,obs=document.getElementById("modal-lead-obs").value.trim();saveLeadEtapa(_leadAtual.id,etapa);const hist=getLeadsHist();if(!hist[_leadAtual.id])hist[_leadAtual.id]=[];hist[_leadAtual.id].push({etapa,obs,data:new Date().toLocaleString("pt-BR")});saveLeadsHist(hist);document.getElementById("modal-lead").style.display="none";_leadAtual=null;renderKanban();}
+function renderLeadsTabela(){const tbody=document.getElementById("leads-tbody");if(!tbody)return;const cores={Novo:"#3498db","Em contato":"#e67e22",Proposta:"#9b59b6",Fechado:"#2ecc71",Perdido:"#e74c3c"};tbody.innerHTML=_leadsData.map(lead=>{const etapa=getLeadEtapa(lead.id)||"Novo",cor=cores[etapa]||"#ccc";return"<tr><td style='padding:10px 12px'>"+(lead.data||"—")+"</td><td style='padding:10px 12px;font-weight:600'>"+(lead.cliente||"—")+"</td><td style='padding:10px 12px'>"+(lead.parceiro||"—")+"</td><td style='padding:10px 12px'><span style='background:"+cor+"22;color:"+cor+";border-radius:20px;padding:3px 10px;font-size:.75rem;font-weight:700'>"+etapa+"</span></td><td style='padding:10px 12px'><button onclick='abrirModalLead("+JSON.stringify(lead)+")' style='padding:5px 12px;border:1.5px solid var(--azul);border-radius:6px;background:#fff;cursor:pointer;font-size:.78rem'>Ver</button></td></tr>";}).join("");}
+function renderUsuarios(){const tbody=document.getElementById("usuarios-tbody");if(!tbody)return;const fixos=[{nome:"Danielle",email:"danielle@taticacontabilidade.com",perfil:"admin",fixo:true},{nome:"Fabiano Azevedo",email:"fabianoazevedo@taticacontabilidade.com",perfil:"admin",fixo:true}];const todos=[...fixos,...SYS_USERS];tbody.innerHTML=todos.map((u,i)=>"<tr><td style='padding:12px 16px;font-weight:600'>"+u.nome+"</td><td style='padding:12px 16px;color:#555'>"+u.email+"</td><td style='padding:12px 16px'><span style='font-size:.72rem;font-weight:700;border-radius:20px;padding:3px 12px;"+(u.perfil==="admin"?"background:#fef9e7;color:#b7950b;border:1px solid #f39c12":"background:#eaf4fb;color:#1a5276;border:1px solid #3498db")+"'>"+(u.perfil==="admin"?"👑 Admin":"💼 Comercial")+"</span></td><td style='padding:12px 16px'>"+(u.fixo?"<span style='color:#bbb;font-size:.75rem'>Conta principal</span>":"<button onclick='excluirUsuario("+(i-fixos.length)+")' style='padding:5px 14px;border:1.5px solid #e74c3c;border-radius:6px;background:#fff;color:#e74c3c;cursor:pointer;font-size:.78rem'>🗑 Remover</button>")+"</td></tr>").join("");const codeEl=document.getElementById("sys-users-code");if(codeEl){const linhas=SYS_USERS.map(u=>'  {nome:"'+u.nome+'", email:"'+u.email+'", senha:"'+u.senha+'", perfil:"'+u.perfil+'"},').join("
+");codeEl.textContent="let SYS_USERS = [
+"+linhas+"
+];";}}
+function salvarNovoUsuario(){const nome=document.getElementById("nu-nome").value.trim(),email=document.getElementById("nu-email").value.trim(),senha=document.getElementById("nu-senha").value.trim(),perfil=document.getElementById("nu-perfil").value,errEl=document.getElementById("nu-erro");if(!nome||!email||!senha){errEl.textContent="Preencha todos os campos.";errEl.style.display="block";return;}if(senha.length<6){errEl.textContent="Senha mínimo 6 caracteres.";errEl.style.display="block";return;}if(SYS_USERS.find(u=>u.email.toLowerCase()===email.toLowerCase())||ADMIN_USERS.some(a=>a.toLowerCase()===email.toLowerCase())){errEl.textContent="E-mail já cadastrado.";errEl.style.display="block";return;}SYS_USERS.push({nome,email,senha,perfil});document.getElementById("modal-novo-user").style.display="none";document.getElementById("nu-nome").value="";document.getElementById("nu-email").value="";document.getElementById("nu-senha").value="";errEl.style.display="none";renderUsuarios();alert("Usuário "+nome+" criado! Copie o código amarelo e me mande para salvar permanentemente.");}
+function excluirUsuario(idx){if(!confirm("Remover este usuário?"))return;SYS_USERS.splice(idx,1);renderUsuarios();}
+</script>
+</body>
+</html>
