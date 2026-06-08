@@ -1044,7 +1044,7 @@ let todosInd=[],filtroAtual="TODOS";
 let PAR_FILTRO={atalho:"mes",mes:"",ano:"",cliente:""};
 let _modalPdfContexto="parceiro";
 
-async function api(p, tentativa=1){
+async async function api(p, tentativa=1){
   try{
     const url=GAS+"?"+new URLSearchParams(p);
     const r=await fetch(url,{method:"GET",redirect:"follow"});
